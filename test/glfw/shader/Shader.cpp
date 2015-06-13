@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifndef __APPLE__
 #include <GL/glew.h>
+#endif
+
 #include "Shader.h"
 #include "../io/IOManager.h"
 #include "../util/Util.h"

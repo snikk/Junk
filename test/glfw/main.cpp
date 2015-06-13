@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef __APPLE__
 #include <GL/glew.h>
+#endif
 
 #ifdef __APPLE__
 #define GLFW_INCLUDE_GLCOREARB
@@ -18,12 +21,14 @@ int main(int argc, char** argv) {
     Window win;
     win.init("Hey ho!", 640, 480, NULL, NULL);
 
+#ifndef __APPLE__
 	GLenum err = glewInit();
 	if (GLEW_OK != err) {
 		printf("Error: %s\n", glewGetErrorString(err));
 		glfwTerminate();
 		return 1;
 	}
+#endif
 
     const GLubyte* ver = glGetString(GL_VERSION);
     printf("This is the version = %s\n", ver);
