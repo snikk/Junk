@@ -1,16 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <GL/glew.h>
+
+#ifdef __APPLE__
+#define GLFW_INCLUDE_GLCOREARB
+#endif
+#include <GLFW/glfw3.h>
 #include "io/Window.h"
 #include "util/Util.h"
 #include "shader/Shader.h"
 
 int main(int argc, char** argv) {
 
-    printf("Hello, World!\n");
+	printf("Hello, World! | location = %s\n", argv[0]);
 
     Window win;
     win.init("Hey ho!", 640, 480, NULL, NULL);
+
+	GLenum err = glewInit();
+	if (GLEW_OK != err) {
+		printf("Error: %s\n", glewGetErrorString(err));
+		glfwTerminate();
+		return 1;
+	}
 
     const GLubyte* ver = glGetString(GL_VERSION);
     printf("This is the version = %s\n", ver);

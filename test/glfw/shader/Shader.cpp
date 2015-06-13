@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <GL/glew.h>
 #include "Shader.h"
 #include "../io/IOManager.h"
 #include "../util/Util.h"
@@ -53,6 +54,11 @@ GLuint Shader::createShader(const char* shader, GLenum type) {
 
     char* source = IOManager::readFile(shader);
     printf("Creating shader with program! | program = %s\n", source);
+	if (!source) {
+		printf("Coun't open file %s\n", shader);
+		glDeleteShader(shaderObj);
+		return 0;
+	}
 
     glShaderSource(shaderObj, 1, &source, NULL);
 
