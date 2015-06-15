@@ -1,8 +1,8 @@
 BIN = bin/
 BUILD = $(BIN)build/
 CC = g++
-OUT = $(BIN)main
-FILE = main.cpp io/IOManager.cpp shader/Shader.cpp util/Util.cpp
+FILE = main
+OUT = $(BIN)$(FILE)
 OBJS = $(BUILD)main.o \
 	   $(BUILD)IOManager.o \
 	   $(BUILD)Shader.o \
@@ -17,7 +17,7 @@ CMD = $(CC) $< -c -o $@ $(INCLUDE)
 
 CFLAGS = $(FRAMEWORKS) $(LIBRARIES) $(INCLUDE)
 
-all: $(BUILD) $(OBJS)
+all: $(BUILD) $(OBJS) shaders
 	$(CC) $(OBJS) -o $(OUT) $(CFLAGS)
 
 $(BUILD)%.o: %.cpp shader/Shader.h io/IOManager.h util/Util.h
@@ -38,7 +38,13 @@ $(BIN):
 $(BUILD): $(BIN)
 	mkdir -p $(BUILD)
 
+shaders:
+	cp -R shader/glsl/ bin/shader/
+
+run:
+	cd $(BIN); ./$(FILE)
 
 clean:
 	rm $(OUT)
 	rm -r $(BUILD)
+	rm -r $(BIN)
