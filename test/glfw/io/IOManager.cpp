@@ -5,6 +5,11 @@
 #include <sys/stat.h>
 
 char* IOManager::readFile(const char* filename) {
+    long size;
+    return IOManager::readFile(filename, &size);
+}
+
+char* IOManager::readFile(const char* filename, long* size) {
     struct stat fileStat;
     stat(filename, &fileStat);
     printf("---------------------------------------------\n");
@@ -23,22 +28,22 @@ char* IOManager::readFile(const char* filename) {
     }
 
     fseek(fp, 0, SEEK_END);
-    long size = ftell(fp);
-    printf("    filesize (seek) = %li\n", size);
+    *size = ftell(fp);
+    printf("    filesize (seek) = %li\n", *size);
     printf("---------------------------------------------\n");
     fseek(fp, 0, SEEK_SET);
 
-    if (size == 0) {
+    if (*size == 0) {
         printf("Error reading size!\n");
         fclose(fp);
     }
     
-    size++;
-    char* str = (char*) malloc(sizeof(char) * size);
+    *size = *size + 1;
+    char* str = (char*) malloc(sizeof(char) * *size);
 
-    memset(str, 0, size);
+    memset(str, 0, *size);
 
-    fread(str, 1, size, fp);
+    fread(str, 1, *size, fp);
 
     fclose(fp);
 

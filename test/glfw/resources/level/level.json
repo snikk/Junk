@@ -1,0 +1,23 @@
+{
+    "param1": "Parameter 1", 
+    "param2": 123, 
+    "param3": 123.456, 
+    "param4": {
+        "sub1": "Sub param 1", 
+        "sub2": 999
+    }
+    "param5": [
+        {
+            "arrParam1": "Item 1", 
+            "arrParam2": 111
+        }, 
+        {
+            "arrParam1": "Item 2", 
+            "arrParam2": 222
+        }, 
+        {
+            "arrParam1": "Item 3", 
+            "arrParam2": 333
+        }
+    ]
+}

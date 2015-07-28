@@ -4,6 +4,7 @@
 class IOManager {
 public:
     static char* readFile(const char* filename);
+    static char* readFile(const char* filename, long* size);
 };
 
 #endif

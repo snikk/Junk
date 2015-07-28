@@ -30,6 +30,7 @@ GLuint Shader::createProgram(const char* vert, const char* frag) {
     }
 
     GLuint program = glCreateProgram();
+    printf("Created program = %d\n", program);
     if (!program) {
         glDeleteShader(vertex);
         glDeleteShader(fragment);
@@ -45,6 +46,7 @@ GLuint Shader::createProgram(const char* vert, const char* frag) {
 
     glDeleteShader(vertex);
     glDeleteShader(fragment);
+    checkError("Finished deleting objects.");
 
     return program;
 } 
@@ -100,6 +102,9 @@ GLuint Shader::createShader(const char* shader, GLenum type) {
 
 void Shader::use() {
     glUseProgram(program);
+
+    printf("use() | program = %d\n", program);
+    checkError("Use program");
 }
 
 void Shader::destroy() {

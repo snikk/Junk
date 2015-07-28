@@ -11,6 +11,9 @@ bool Window::init(const char* name, int width, int height, GLFWmonitor* monitor,
         return false;
     }
 
+    this->width = width;
+    this->height = height;
+
 #ifdef __APPLE__
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
@@ -27,6 +30,9 @@ bool Window::init(const char* name, int width, int height, GLFWmonitor* monitor,
     }
 
     glfwMakeContextCurrent(window);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     return true;
 }

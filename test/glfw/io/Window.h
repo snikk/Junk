@@ -12,6 +12,8 @@ public:
     bool init(const char* name, int width, int height, GLFWmonitor* monitor, GLFWwindow* share);
 
     GLFWwindow* window;
+    int width;
+    int height;
 private:
 };
 

@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
 
     char msg[1000];
     //int len = sprintf(msg, "");
-    int len = sprintf(msg, "GET %s HTTP/1.1\r\nHost: %s\r\n\r\n", "/ip", "httpbin.org");
+    int len = sprintf(msg, "GET %s HTTP/1.1\r\nHost: %s\r\n\r\n", "/get", "httpbin.org");
     printf("%s\n------------------------------------\n", msg);
 
     if ((numbytes = send(sockfd, msg, len, 0)) == 0) {
