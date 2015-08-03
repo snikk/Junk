@@ -37,3 +37,7 @@ bool Window::init(const char* name, int width, int height, GLFWmonitor* monitor,
     return true;
 }
 
+void Window::swapBuffers() {
+    glfwSwapBuffers(window);
+}
+

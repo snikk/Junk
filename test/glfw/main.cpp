@@ -1,41 +1,34 @@
 #include <png.h>
 #include "common.h"
+#include <unistd.h>
 #include "util/Util.h"
 #include "shader/Shader.h"
 #include "io/Window.h"
 #include "io/IOManager.h"
 #include "io/ImageLoader.h"
 #include "io/TextureCache.h"
+#include "io/InputManager.h"
 #include "drawing/Texture.h"
 #include "drawing/SpriteBatch.h"
 #include "drawing/Camera.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
-void cursorFun(GLFWwindow* window, double xPos, double yPos);
-
-class KeyWrapper {
-public:
-    void keyFun(GLFWwindow* window, int key, int scancode, int action, int mods);
-};
 void jsonTest();
-
-glm::vec2 camPos(0.25f, 0.25f);
 
 int main(int argc, char** argv) {
 
 	printf("Hello, World! | location = %s\n", argv[0]);
 
     Window win;
-    win.init("Hey ho!", 1280, 960, NULL, NULL);
+    win.init("Hey ho!", 640, 480, NULL, NULL);
     printf("window.width = %d | window.height = %d\n", win.width, win.height);
 
-    KeyWrapper keyWrapper;
-    keyWrapper.keyFun(win.window, 1, 2, 3, 4);
-    glfwSetCursorPosCallback(win.window, cursorFun);
-    glfwSetKeyCallback(win.window, &(keyWrapper.keyFun));
+    glfwSetCursorPosCallback(win.window, InputManager::cursorFunction);
+    glfwSetKeyCallback(win.window, InputManager::keyFunction);
 
     jsonTest();
 
@@ -80,7 +73,7 @@ int main(int argc, char** argv) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         checkError("Clear!");
 
-        camera.setPosition(camPos);
+        camera.setPosition(InputManager::instance().getMouseCoords());
         camera.update();
         glUniformMatrix4fv(matLoc, 1, GL_FALSE, glm::value_ptr(camera.getCameraMatrix()));
 
@@ -100,10 +93,36 @@ int main(int argc, char** argv) {
         sprites.end();
         sprites.renderBatch();
 
+        if (InputManager::instance().isKeyPressed(GLFW_KEY_SPACE)) {
+            printf("Pressed space!\n");
+        }
+
+        if (InputManager::instance().isKeyDown(GLFW_KEY_A)) {
+            printf("Left!\n");
+        }
+
+        if (InputManager::instance().isKeyDown(GLFW_KEY_D)) {
+            printf("Right!\n");
+        }
+
+        if (InputManager::instance().isKeyDown(GLFW_KEY_W)) {
+            printf("Up!\n");
+        }
+
+        if (InputManager::instance().isKeyDown(GLFW_KEY_S)) {
+            printf("Down!\n");
+        }
+
         glfwSwapBuffers(win.window);
         checkError("Swap Buffers!");
+        //printf("Pre Poll\n");
+        InputManager::instance().update();
+        //InputManager::instance().print();
         glfwPollEvents();
+        //printf("Post Poll\n");
         checkError("Poll Events!");
+
+        usleep(1000000 / 60);
     }
 
     shader.destroy();
@@ -113,16 +132,13 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-void cursorFun(GLFWwindow* window, double xPos, double yPos) {
-    camPos.x = xPos;
-    camPos.y = yPos;
-}
-
 void jsonTest() {
-    printf("JSON Parsing\n");
-    const char* json = IOManager::readFile("level/level.json");
+    printf("JSON Parsing\n"); const char* json = IOManager::readFile("level/level.json"); printf("json = %s\n", json);
     rapidjson::Document d;
     d.Parse(json);
+    if (d.HasParseError()) {
+        printf("PARSE ERROR! | offset = %zu | %s\n", d.GetErrorOffset(), GetParseError_En(d.GetParseError()));
+    }
 
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
@@ -134,6 +150,3 @@ void jsonTest() {
     printf("---------------------------\n");
 }
 
-void KeyWrapper::keyFun(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    printf("KeyFun | key = %d | scancode = %d | action = %d | mods = %d\n", key, scancode, action, mods);
-}

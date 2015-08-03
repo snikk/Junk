@@ -3,7 +3,7 @@
 
 #include "io/Window.h"
 #include "drawing/Camera.h"
-#include
+#include "shader/Shader.h"
 
 enum class GameState {
     PLAY, 
@@ -25,13 +25,13 @@ private:
     void updateAgents(float deltaTime);
     void updateBullets(float deltaTime);
     void checkVictory();
-    void processInput();
+    void processInput(GLFWwindow *window, int key, int scancode, int mods);
     void drawGame();
 
     /// Member Variables                                                                    
     Window _window; ///< The game window                                           
 
-    GLSLProgram _textureProgram; ///< The shader program                           
+    Shader _textureProgram; ///< The shader program                           
 
     InputManager _inputManager; ///< Handles input                                 
 

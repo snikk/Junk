@@ -19,7 +19,7 @@ INCLUDE = -I ~/dev/c++/glfw-3.1.1/include/ \
 		  -I/usr/local/include/ \
 		  -I ~/dev/c++/glm/ \
 		  -I ~/dev/c++/rapidjson/include/
-LIBRARIES = -L/usr/local/lib -lglfw3 -lz -lpng
+LIBRARIES = -L/usr/local/lib -lglfw3 -lz -lpng -lc
 FRAMEWORKS = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
 
 CMD = $(CC) $< -c -o $@ -g $(INCLUDE) -std=c++11
@@ -56,7 +56,8 @@ $(BUILD): $(BIN)
 .PHONY: resources
 resources: 
 	cp -R shader/glsl/ $(BIN)shader/
-	cp -R resources/images $(BIN)images/
+	cp -R resources/images/ $(BIN)images/
+	cp -R resources/level/ $(BIN)level/
 
 run:
 	cd $(BIN); ./$(FILE)

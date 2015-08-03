@@ -5,7 +5,7 @@
     "param4": {
         "sub1": "Sub param 1", 
         "sub2": 999
-    }
+    }, 
     "param5": [
         {
             "arrParam1": "Item 1", 

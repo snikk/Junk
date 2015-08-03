@@ -102,12 +102,38 @@ GLuint Shader::createShader(const char* shader, GLenum type) {
 
 void Shader::use() {
     glUseProgram(program);
-
-    printf("use() | program = %d\n", program);
+    for (auto& it : attributes)
+        glEnableVertexAttribArray(it.second);
     checkError("Use program");
+}
+
+void Shader::unuse() {
+    glUseProgram(0);
+    for (auto& it : attributes)
+        glDisableVertexAttribArray(it.second);
 }
 
 void Shader::destroy() {
     glDeleteProgram(program);
+}
+
+void Shader::addAttribute(const char* name) {
+    GLint posLoc = glGetAttribLocation(program, "position");
+    checkError("glGetAttribLocation!");
+    attributes[name] = posLoc;
+}
+
+GLint Shader::getAttribute(const char* name) {
+    const auto& it = attributes.find(name);
+    if (it != attributes.end())
+        return it->second;
+
+    return -1;
+}
+
+GLint Shader::getUniform(const char* name) {
+    GLint uniform = glGetUniformLocation(program, name);
+    checkError("glGetUniformLocation()");
+    return uniform;
 }
 
