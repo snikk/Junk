@@ -118,6 +118,8 @@ void SpriteBatch::createVertexArray(Shader* shader) {
 
     GLint posLoc = shader->getAttribute("vertexPosition");
     CHK_ERR("Get vertexPosition!");
+    GLint colLoc = shader->getAttribute("vertexColor");
+    checkError("fragmentColor!");
     GLint texLoc = shader->getAttribute("vertexUV");
     checkError("texture UV!");
     GLint samLoc = shader->getUniform("sampler");
@@ -125,10 +127,13 @@ void SpriteBatch::createVertexArray(Shader* shader) {
 
     //Tell opengl what attribute arrays we need
     glEnableVertexAttribArray(posLoc);
+    glEnableVertexAttribArray(colLoc);
     glEnableVertexAttribArray(texLoc);
 
     //This is the position attribute pointer
     glVertexAttribPointer(posLoc, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+    //This is the position attribute pointer
+    glVertexAttribPointer(colLoc, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void*)offsetof(Vertex, color));
     //This is the UV attribute pointer
     glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 
