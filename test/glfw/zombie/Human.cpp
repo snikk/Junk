@@ -3,6 +3,9 @@
 #include <random>
 #include <glm/gtx/rotate_vector.hpp>
 
+# define M_PI           3.14159265358979323846
+const double RADIANS = M_PI / 180.0;
+
 Human::Human() :
     _frames(0)
 {
@@ -41,7 +44,7 @@ void Human::update(const std::vector<std::string>& levelData,
                    float deltaTime) {
 
     static std::mt19937 randomEngine(time(nullptr));
-    static std::uniform_real_distribution<float> randRotate(-40.0f, 40.0f);
+    static std::uniform_real_distribution<float> randRotate(-40.0f * RADIANS, 40.0f * RADIANS);
 
     _position += _direction * _speed * deltaTime;
 
