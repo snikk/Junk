@@ -12,6 +12,7 @@ public:
         return manager;
     }
     static void keyFunction(GLFWwindow *win, int key, int scancode, int action, int mods);
+    static void mouseButtonFunction(GLFWwindow *win, int button, int action, int mods);
     static void cursorFunction(GLFWwindow *win, double xPos, double yPos);
 
     void update();         

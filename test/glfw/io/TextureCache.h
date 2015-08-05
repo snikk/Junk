@@ -8,7 +8,7 @@
 
 struct cmp_str {
     bool operator()(const char* lhs, const char* rhs) const {
-        return std::strcmp(lhs, rhs) < 0;
+        return strcmp(lhs, rhs) < 0;
     }
 };
 

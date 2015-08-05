@@ -7,6 +7,10 @@
 #include <GLFW/glfw3.h>
 
 void checkError(const char* msg) {
+    checkError(msg, "NO_FILE", 0);
+}
+
+void checkError(const char* msg, const char* file, int line) {
     GLenum err;
     const char* errorString;
     while ((err = glGetError()) != GL_NO_ERROR) {
@@ -36,6 +40,6 @@ void checkError(const char* msg) {
                 errorString = "UNKNOWN_ERROR";
                 break;
         }
-        printf("----==== Caught an %s | %s\n", errorString, msg);
+        printf("----==== Caught an %s | %s | %s:%d\n", errorString, msg, file, line);
     }
 }

@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 
-#include <Bengine/SpriteBatch.h>
+#include "../drawing/SpriteBatch.h"
+#include "../shader/Shader.h"
 
 const int TILE_WIDTH = 64;
 
@@ -11,7 +12,7 @@ class Level
 {
 public:
     // Load the level
-    Level(const std::string& fileName);
+    Level(const std::string& fileName, Shader* shader);
     ~Level();
 
     void draw();
@@ -27,7 +28,7 @@ public:
 private:
     std::vector<std::string> _levelData;
     int _numHumans;
-    Bengine::SpriteBatch _spriteBatch;
+    SpriteBatch _spriteBatch;
 
     glm::vec2 _startPlayerPos;
     std::vector<glm::vec2> _zombieStartPositions;

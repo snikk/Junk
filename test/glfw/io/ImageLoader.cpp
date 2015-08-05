@@ -55,6 +55,7 @@ Texture ImageLoader::loadPNG(const char* name) {
                 checkError("Param Min!");
 
                 glGenerateMipmap(GL_TEXTURE_2D);
+                checkError("Generate Mipmap!");
 
                 free(buffer);
             } else {

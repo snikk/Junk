@@ -1,6 +1,22 @@
 #include "MainGame.h"
+#include <random>
+#include <ctime>
+#include <algorithm>
+#include "io/InputManager.h"
+#include "io/Error.h"
+#include "common.h"
 
-MainGame() :                                                                                
+#include <iostream>
+
+#include "zombie/Gun.h"
+#include "zombie/Zombie.h"
+#include "util/Util.h"
+
+const float HUMAN_SPEED = 1.0f;
+const float ZOMBIE_SPEED = 1.3f;
+const float PLAYER_SPEED = 5.0f;
+
+MainGame::MainGame() :                                                                                
     _screenWidth(640),
     _screenHeight(480),
     _gameState(GameState::PLAY),
@@ -9,7 +25,7 @@ MainGame() :
     _numHumansKilled(0),                                                                               
     _numZombiesKilled(0) {}
 
-~MainGame() {
+MainGame::~MainGame() {
     // Don't forget to delete the levels!                                                              
     for (int i = 0; i < _levels.size(); i++) {                                                         
         delete _levels[i];                                                                             
@@ -35,14 +51,18 @@ void MainGame::initSystems() {
     initShaders();
     _agentSpriteBatch.init(&_textureProgram);
     _camera.init(_screenWidth, _screenHeight);
+
+    glfwSetCursorPosCallback(_window.window, InputManager::cursorFunction);
+    glfwSetMouseButtonCallback(_window.window, InputManager::mouseButtonFunction);
+    glfwSetKeyCallback(_window.window, InputManager::keyFunction);
 }
 
 void MainGame::initLevel() {
-    _levels.push_back(new Level("level/level1.txt"));
+    _levels.push_back(new Level("level/level1.txt", &_textureProgram));
     _currentLevel = 0;
 
     _player = new Player();
-    _player->init(PLAYER_SPEED, _levels[_currentLevel]->getStartPlayerPos(), &_inputManager, &_camera, &_bullets);
+    _player->init(PLAYER_SPEED, _levels[_currentLevel]->getStartPlayerPos(), &_camera, &_bullets);
 
     _humans.push_back(_player);
 
@@ -87,7 +107,7 @@ void MainGame::gameLoop() {
     const long MS_PER_SECOND = 1000; // Number of milliseconds in a second
     const long US_PER_SECOND = 1000000; // Number of microseconds in a second
     const long NS_PER_SECOND = 1000000000; // Number of nanoseconds in a second
-    const long DESIRED_FRAMETIME = US_PER_SECOND / DESIRED_FPS; // The desired frame time per frame
+    const long DESIRED_FRAMETIME = (US_PER_SECOND / DESIRED_FPS) / US_PER_SECOND; // The desired frame time per frame
     const float MAX_DELTA_TIME = 1.0f; // Maximum size of deltaTime
 
     // Zoom out the camera by 4x
@@ -101,15 +121,17 @@ void MainGame::gameLoop() {
     // Main loop
     while (_gameState == GameState::PLAY) {
         // Calculate the frameTime in milliseconds
-        newTime = elapsedTime = glfwGetTime();
+        newTime = glfwGetTime();
         float frameTime = newTime - previousTime;
-        previousTime = newTime; // Store newTicks in previousTicks so we can use it next frame
         // Get the total delta time
         float totalDeltaTime = frameTime / DESIRED_FRAMETIME;
 
+        std::cout << "nt = " << newTime << " | pt = " << previousTime << " | ft = " << frameTime << " | tdt = " << totalDeltaTime << std::endl;
+        previousTime = newTime; // Store newTicks in previousTicks so we can use it next frame
+
         checkVictory();
 
-        _inputManager.update();
+        InputManager::instance().update();
 
         processInput();
         
@@ -135,11 +157,11 @@ void MainGame::gameLoop() {
 
         // End the frame, limit the FPS, and get the current FPS.
         float renderTime = glfwGetTime() - newTime;
-        long totalSleepTime = DESIRED_FRAMERATE - (DESIRED_FRAMERATE * currentTime);
+        long totalSleepTime = (US_PER_SECOND / DESIRED_FPS) - (US_PER_SECOND * renderTime);
         if (totalSleepTime > 0) {
             usleep(totalSleepTime);
         }
-        std::cout << "Sleeptime = " << totalSleepTime << " | fps = " << _fps << std::endl;
+        std::cout << "Sleeptime = " << totalSleepTime << " | fps = " << totalDeltaTime << " | time = " << glfwGetTime() << " | renderTime = " << renderTime << std::endl;
     }
 }
 
@@ -181,7 +203,7 @@ void MainGame::updateAgents(float deltaTime) {
 
         // Collide with player
         if (_zombies[i]->collideWithAgent(_player)) {
-            Bengine::fatalError("YOU LOSE");
+            fatalError("YOU LOSE");
         }
     }
 
@@ -280,36 +302,47 @@ void MainGame::checkVictory() {
                     _numHumansKilled, _numZombiesKilled, _humans.size() - 1, _levels[_currentLevel]->getNumHumans());
 
         // Easy way to end the game :P
-        Bengine::fatalError("");
+        fatalError("");
     }
 }
 
 void MainGame::processInput() {
+    if (glfwWindowShouldClose(_window.window))
+        _gameState = GameState::EXIT;
     glfwPollEvents();
 }
 
 void MainGame::drawGame() {
     // Set the base depth to 1.0
     glClearDepth(1.0);
+    CHK_ERR("glClearDepth");
     // Clear the color and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    CHK_ERR("glClear");
 
+    CHK_ERR("Before use");
     _textureProgram.use();
 
     // Draw code goes here
     glActiveTexture(GL_TEXTURE0);
+    CHK_ERR("glActiveTexture");
 
     // Make sure the shader uses texture 0
-    GLint textureUniform = _textureProgram.getUniformLocation("mySampler");
+    GLint textureUniform = _textureProgram.getUniform("mySampler");
+    CHK_ERR("texture");
     glUniform1i(textureUniform, 0);
+    CHK_ERR("setUniform");
 
     // Grab the camera matrix
     glm::mat4 projectionMatrix = _camera.getCameraMatrix();
-    GLint pUniform = _textureProgram.getUniformLocation("P");
+    GLint pUniform = _textureProgram.getUniform("P");
+    CHK_ERR("getUniform");
     glUniformMatrix4fv(pUniform, 1, GL_FALSE, &projectionMatrix[0][0]);
+    CHK_ERR("getUniform");
 
     // Draw the level
     _levels[_currentLevel]->draw();
+    CHK_ERR("draw");
 
     // Begin drawing agents
     _agentSpriteBatch.begin();
@@ -340,11 +373,13 @@ void MainGame::drawGame() {
 
     // Render to the screen
     _agentSpriteBatch.renderBatch();
+    CHK_ERR("render batches");
 
     // Unbind the program
     _textureProgram.unuse();
+    CHK_ERR("unuse");
 
     // Swap our buffer and draw everything to the screen!
-    _window.swapBuffer();
+    _window.swapBuffers();
 }
 

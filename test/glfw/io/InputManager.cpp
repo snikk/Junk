@@ -11,6 +11,13 @@ void InputManager::cursorFunction(GLFWwindow *win, double xPos, double yPos) {
     instance().setMouseCoords(xPos, yPos);
 }
 
+void InputManager::mouseButtonFunction(GLFWwindow *win, int button, int action, int mods) {
+    if (action == GLFW_PRESS)
+        instance().pressKey(button);
+    if (action == GLFW_RELEASE)
+        instance().releaseKey(button);
+}
+
 InputManager::InputManager() : _mouseCoords(0.0f) {}
 InputManager::~InputManager() {}
 

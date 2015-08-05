@@ -1,6 +1,5 @@
 #include <png.h>
 #include "common.h"
-#include <unistd.h>
 #include "util/Util.h"
 #include "shader/Shader.h"
 #include "io/Window.h"
@@ -17,10 +16,17 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
+#include "MainGame.h"
+
 void jsonTest();
 
 int main(int argc, char** argv) {
+    MainGame game;
+    game.run();
 
+    return 0;
+
+    /*
 	printf("Hello, World! | location = %s\n", argv[0]);
 
     Window win;
@@ -130,6 +136,7 @@ int main(int argc, char** argv) {
     glfwTerminate();
 
     return 0;
+    */
 }
 
 void jsonTest() {

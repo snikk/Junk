@@ -1,4 +1,4 @@
-#version 130
+#version 410
 //The fragment shader operates on each pixel in a given polygon
 
 in vec2 fragmentPosition;
@@ -19,5 +19,5 @@ void main() {
     vec4 textureColor = texture(mySampler, fragmentUV);
     
     //Make crazy colors using time and position!
-    color = fragmentColor * textureColor;
+    color = textureColor;//fragmentColor * textureColor;
 }

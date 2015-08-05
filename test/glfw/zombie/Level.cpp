@@ -1,18 +1,22 @@
 #include "Level.h"
 
-#include <Bengine/Errors.h>
+#include "../io/Error.h"
 #include <fstream>
 #include <iostream>
-#include <Bengine/ResourceManager.h>
+#include "../io/ResourceManager.h"
 
-Level::Level(const std::string& fileName) {
+Level::Level(const std::string& fileName, Shader* shader) {
 
     std::ifstream file;
     file.open(fileName);
 
     // Error checking
     if (file.fail()) {
-        Bengine::fatalError("Failed to open " + fileName);
+        int size = 16 + fileName.size();
+        char *name = (char*) malloc(size);
+        name[size] = '\0';
+        snprintf(name, size, "Failed to open %s", fileName.c_str());
+        fatalError(name);
     }
 
     // Throw away the first string in tmp
@@ -27,12 +31,12 @@ Level::Level(const std::string& fileName) {
         _levelData.emplace_back(tmp);
     }    
     
-    _spriteBatch.init();
+    _spriteBatch.init(shader);
     _spriteBatch.begin();
 
     glm::vec4 uvRect(0.0f, 0.0f, 1.0f, 1.0f);
 
-    Bengine::ColorRGBA8 whiteColor;
+    ColorRGBA8 whiteColor;
     whiteColor.r = 255;
     whiteColor.g = 255;
     whiteColor.b = 255;
@@ -53,21 +57,21 @@ Level::Level(const std::string& fileName) {
                 case 'R':
                     _spriteBatch.draw(destRect,
                                       uvRect,
-                                      Bengine::ResourceManager::getTexture("Textures/red_bricks.png").id,
+                                      ResourceManager::getTexture("images/red_bricks.png").id,
                                       0.0f,
                                       whiteColor);      
                     break;
                 case 'G':
                     _spriteBatch.draw(destRect,
                                       uvRect,
-                                      Bengine::ResourceManager::getTexture("Textures/glass.png").id,
+                                      ResourceManager::getTexture("images/glass.png").id,
                                       0.0f,
                                       whiteColor);
                     break;
                 case 'L':
                     _spriteBatch.draw(destRect,
                                       uvRect,
-                                      Bengine::ResourceManager::getTexture("Textures/light_bricks.png").id,
+                                      ResourceManager::getTexture("images/light_bricks.png").id,
                                       0.0f,
                                       whiteColor);
                     break;

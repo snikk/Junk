@@ -13,7 +13,17 @@ OBJS = $(BUILD)main.o \
 	   $(BUILD)Camera.o \
 	   $(BUILD)TextureCache.o \
 	   $(BUILD)InputManager.o \
-	   $(BUILD)ImageLoader.o
+	   $(BUILD)ImageLoader.o \
+	   $(BUILD)ResourceManager.o \
+	   $(BUILD)Error.o \
+	   $(BUILD)Agent.o \
+	   $(BUILD)Bullet.o \
+	   $(BUILD)Gun.o \
+	   $(BUILD)Human.o \
+	   $(BUILD)Level.o \
+	   $(BUILD)MainGame.o \
+	   $(BUILD)Player.o \
+	   $(BUILD)Zombie.o
 
 INCLUDE = -I ~/dev/c++/glfw-3.1.1/include/ \
 		  -I/usr/local/include/ \
@@ -22,12 +32,17 @@ INCLUDE = -I ~/dev/c++/glfw-3.1.1/include/ \
 LIBRARIES = -L/usr/local/lib -lglfw3 -lz -lpng -lc
 FRAMEWORKS = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
 
-CMD = $(CC) $< -c -o $@ -g $(INCLUDE) -std=c++11
+CMD = $(CC) $< -c $(OUTPUT_FLAG) -o $@ $(INCLUDE) -std=c++11
 
-CFLAGS = -g $(FRAMEWORKS) $(LIBRARIES) $(INCLUDE) -std=c++11
+CFLAGS = $(FRAMEWORKS) $(LIBRARIES) $(INCLUDE) -std=c++11
 
+all: OUTPUT_FLAG = -g -og
 all: $(BUILD) $(OBJS) resources
-	$(CC) $(OBJS) -o $(OUT) $(CFLAGS)
+	$(CC) $(OBJS) $(OUTPUT_FLAG) -o $(OUT) $(CFLAGS)
+
+opt: OUTPUT_FLAG = -o3
+opt: clean $(BUILD) $(OBJS) resources
+	$(CC) $(OBJS) $(OUTPUT_FLAG) -o $(OUT) $(CFLAGS)
 
 debug: all
 	dsymutil -o $(OUT).dSYM $(OUT)
@@ -45,6 +60,9 @@ $(BUILD)%.o: util/%.cpp
 	$(CMD)
 
 $(BUILD)%.o: drawing/%.cpp
+	$(CMD)
+
+$(BUILD)%.o: zombie/%.cpp
 	$(CMD)
 
 $(BIN):

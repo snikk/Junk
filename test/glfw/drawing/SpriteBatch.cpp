@@ -116,12 +116,12 @@ void SpriteBatch::createVertexArray(Shader* shader) {
     }
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 
-    GLint posLoc = glGetAttribLocation(shader->program, "position");
-    checkError("glGetAttribLocation!");
-    GLint texLoc = glGetAttribLocation(shader->program, "texture");
-    checkError("glGetAttribLocation!");
-    GLint samLoc = glGetUniformLocation(shader->program, "sampler");
-    checkError("glGetUniformLocation!");
+    GLint posLoc = shader->getAttribute("vertexPosition");
+    CHK_ERR("Get vertexPosition!");
+    GLint texLoc = shader->getAttribute("vertexUV");
+    checkError("texture UV!");
+    GLint samLoc = shader->getUniform("sampler");
+    checkError("Sampler!");
 
     //Tell opengl what attribute arrays we need
     glEnableVertexAttribArray(posLoc);

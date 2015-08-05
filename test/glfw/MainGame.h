@@ -5,6 +5,10 @@
 #include "drawing/Camera.h"
 #include "shader/Shader.h"
 
+#include "zombie/Player.h"
+#include "zombie/Level.h"
+#include "zombie/Bullet.h"
+
 enum class GameState {
     PLAY, 
     EXIT
@@ -25,15 +29,13 @@ private:
     void updateAgents(float deltaTime);
     void updateBullets(float deltaTime);
     void checkVictory();
-    void processInput(GLFWwindow *window, int key, int scancode, int mods);
+    void processInput();
     void drawGame();
 
     /// Member Variables                                                                    
     Window _window; ///< The game window                                           
 
     Shader _textureProgram; ///< The shader program                           
-
-    InputManager _inputManager; ///< Handles input                                 
 
     Camera2D _camera; ///< Main Camera                                             
 
