@@ -31,6 +31,8 @@ public:
 
     glm::vec2 getPosition() const { return _position; }
 
+    float getHealthPercentage() const { return _health / _maxHealth; }
+
 protected:
 
     void checkTilePosition(const std::vector<std::string>& levelData,
@@ -44,5 +46,6 @@ protected:
     ColorRGBA8 _color;
     float _speed;
     float _health;
+    float _maxHealth;
 };
 

@@ -21,6 +21,7 @@ void Player::init(float speed, glm::vec2 pos, Camera2D* camera, std::vector<Bull
     _color.b = 185;
     _color.a = 255;
     _health = 150;
+    _maxHealth = 150;
 }
 
 void Player::addGun(Gun* gun) {

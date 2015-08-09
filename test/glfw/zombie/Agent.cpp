@@ -99,7 +99,9 @@ void Agent::draw(SpriteBatch& _spriteBatch) {
     destRect.z = AGENT_WIDTH;
     destRect.w = AGENT_WIDTH;
 
-    _spriteBatch.draw(destRect, uvRect, textureID, 0.0f, _color);
+    float per = getHealthPercentage();
+    ColorRGBA8 newColor(_color.r * per, _color.g * per, _color.b * per, _color.a);
+    _spriteBatch.draw(destRect, uvRect, textureID, 0.0f, newColor);
 }
 
 bool Agent::applyDamage(float damage) {

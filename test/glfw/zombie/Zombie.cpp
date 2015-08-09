@@ -10,10 +10,13 @@ Zombie::~Zombie()
 {
 }
 
-void Zombie::init(float speed, glm::vec2 pos) {
+void Zombie::init(float speed, glm::vec2 pos, float damage) {
     _speed = speed;
     _position = pos;
     _health = 150;
+    _maxHealth = 150;
+    _damage = damage;
+    _state = ZombieState::ALIVE;
     // Set Green Color
     _color = ColorRGBA8(0, 160, 0, 255);
 }
@@ -23,18 +26,35 @@ void Zombie::update(const std::vector<std::string>& levelData,
                     std::vector<Zombie*>& zombies,
                     float deltaTime) {
 
-    // Find the closest human
-    Human* closestHuman = getNearestHuman(humans);
+    switch (_state) {
+    case ZombieState::BORN: {
+        _health += 1 * deltaTime;
+        if (_health >= _maxHealth)
+            _state = ZombieState::ALIVE;
+        collideWithLevel(levelData);
+        break;
+                            }
 
-    // If we found a human, move towards him
-    if (closestHuman != nullptr) {
-        // Get the direction vector twoards the player
-        glm::vec2 direction = glm::normalize(closestHuman->getPosition() - _position);
-        _position += direction * _speed * deltaTime;
+    case ZombieState::ALIVE: {
+        // Find the closest human
+        Human* closestHuman = getNearestHuman(humans);
+
+        // If we found a human, move towards him
+        if (closestHuman != nullptr) {
+            // Get the direction vector twoards the player
+            glm::vec2 direction = glm::normalize(closestHuman->getPosition() - _position);
+            _position += direction * _speed * deltaTime;
+        }
+
+        // Do collision
+        collideWithLevel(levelData);
+        break;
+                             }
+    case ZombieState::DEAD: {
+        collideWithLevel(levelData);
+        break;
+                            }
     }
-
-    // Do collision
-    collideWithLevel(levelData);
 }
 
 Human* Zombie::getNearestHuman(std::vector<Human*>& humans) {

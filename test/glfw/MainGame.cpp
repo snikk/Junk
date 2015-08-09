@@ -12,8 +12,6 @@
 #include "zombie/Zombie.h"
 #include "util/Util.h"
 
-# define M_PI           3.14159265358979323846
-
 const float RADIANS = M_PI / 180.0;
 
 const float HUMAN_SPEED = 1.0f;
@@ -21,8 +19,8 @@ const float ZOMBIE_SPEED = 1.3f;
 const float PLAYER_SPEED = 5.0f;
 
 MainGame::MainGame() :                                                                                
-    _screenWidth(640),
-    _screenHeight(480),
+    _screenWidth(1280),
+    _screenHeight(960),
     _gameState(GameState::PLAY),
     _fps(0),
     _player(nullptr),
@@ -87,7 +85,7 @@ void MainGame::initLevel() {
     const std::vector<glm::vec2>& zombiePositions = _levels[_currentLevel]->getZombieStartPositions();
     for (int i = 0; i < zombiePositions.size(); i++) {
         _zombies.push_back(new Zombie);
-        _zombies.back()->init(ZOMBIE_SPEED, zombiePositions[i]);
+        _zombies.back()->init(ZOMBIE_SPEED, zombiePositions[i], 0.15);
     }
 
     // Set up the players guns
@@ -130,7 +128,6 @@ void MainGame::gameLoop() {
         // Get the total delta time
         float totalDeltaTime = frameTime / DESIRED_FRAMETIME;
 
-        std::cout << "nt = " << newTime << " | pt = " << previousTime << " | ft = " << frameTime << " | tdt = " << totalDeltaTime << std::endl;
         previousTime = newTime; // Store newTicks in previousTicks so we can use it next frame
 
         checkVictory();
@@ -165,7 +162,6 @@ void MainGame::gameLoop() {
         if (totalSleepTime > 0) {
             usleep(totalSleepTime);
         }
-        std::cout << "Sleeptime = " << totalSleepTime << " | fps = " << totalDeltaTime << " | time = " << glfwGetTime() << " | renderTime = " << renderTime << std::endl;
     }
 }
 
@@ -195,19 +191,26 @@ void MainGame::updateAgents(float deltaTime) {
         // Collide with humans
         for (int j = 1; j < _humans.size(); j++) {
             if (_zombies[i]->collideWithAgent(_humans[j])) {
-                // Add the new zombie
-                _zombies.push_back(new Zombie);
-                _zombies.back()->init(ZOMBIE_SPEED, _humans[j]->getPosition());
-                // Delete the human
-                delete _humans[j];
-                _humans[j] = _humans.back();
-                _humans.pop_back();
+                if (_humans[j]->applyDamage(deltaTime * _zombies[i]->getDamage())) {
+                    // Add the new zombie
+                    _zombies.push_back(new Zombie);
+                    _zombies.back()->init(ZOMBIE_SPEED, _humans[j]->getPosition(), 0.15);
+                    _zombies.back()->setState(ZombieState::BORN);
+                    _zombies.back()->setHealth(0.0f);
+
+                    // Delete the human
+                    delete _humans[j];
+                    _humans[j] = _humans.back();
+                    _humans.pop_back();
+                }
             }
         }
 
         // Collide with player
         if (_zombies[i]->collideWithAgent(_player)) {
-            fatalError("YOU LOSE");
+            if (_player->applyDamage(deltaTime * _zombies[i]->getDamage())) {
+                fatalError("YOU LOSE");
+            }
         }
     }
 
