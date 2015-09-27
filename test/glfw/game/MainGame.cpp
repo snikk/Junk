@@ -2,15 +2,15 @@
 #include <random>
 #include <ctime>
 #include <algorithm>
-#include "io/InputManager.h"
-#include "io/Error.h"
-#include "common.h"
+#include <io/InputManager.h>
+#include <io/Error.h>
+#include <common.h>
 
 #include <iostream>
 
 #include "zombie/Gun.h"
 #include "zombie/Zombie.h"
-#include "util/Util.h"
+#include <util/Util.h>
 
 const float RADIANS = M_PI / 180.0;
 

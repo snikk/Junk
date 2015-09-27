@@ -1,20 +1,20 @@
-#include <png.h>
-#include "common.h"
-#include "util/Util.h"
-#include "shader/Shader.h"
-#include "io/Window.h"
-#include "io/IOManager.h"
-#include "io/ImageLoader.h"
-#include "io/TextureCache.h"
-#include "io/InputManager.h"
-#include "drawing/Texture.h"
-#include "drawing/SpriteBatch.h"
-#include "drawing/Camera.h"
-#include <glm/gtc/type_ptr.hpp>
-#include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/stringbuffer.h>
+//#include <png.h>
+//#include "common.h"
+//#include "util/Util.h"
+//#include "shader/Shader.h"
+//#include "io/Window.h"
+//#include "io/IOManager.h"
+//#include "io/ImageLoader.h"
+//#include "io/TextureCache.h"
+//#include "io/InputManager.h"
+//#include "drawing/Texture.h"
+//#include "drawing/SpriteBatch.h"
+//#include "drawing/Camera.h"
+//#include <glm/gtc/type_ptr.hpp>
+//#include <rapidjson/document.h>
+//#include <rapidjson/error/en.h>
+//#include <rapidjson/writer.h>
+//#include <rapidjson/stringbuffer.h>
 
 #include "MainGame.h"
 
@@ -139,6 +139,7 @@ int main(int argc, char** argv) {
     */
 }
 
+/*
 void jsonTest() {
     printf("JSON Parsing\n"); const char* json = IOManager::readFile("level/level.json"); printf("json = %s\n", json);
     rapidjson::Document d;
@@ -156,4 +157,5 @@ void jsonTest() {
     printf("%s\n", buffer.GetString());
     printf("---------------------------\n");
 }
+*/
 

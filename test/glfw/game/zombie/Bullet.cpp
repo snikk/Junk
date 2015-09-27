@@ -1,5 +1,5 @@
 #include "Bullet.h"
-#include "../io/ResourceManager.h"
+#include <io/ResourceManager.h>
 
 #include "Agent.h"
 #include "Human.h"

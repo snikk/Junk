@@ -9,10 +9,12 @@ endif ()
 
 set(GLFW_BUILD_EXAMPLES OFF)
 add_subdirectory (3rdparty/glfw)
+find_package(PNG REQUIRED)
 include_directories (
-    /Users/jglenn/dev/c++/glfw-3.1.1/include
-	~/dev/c++/glm/
-    ~/dev/c++/rapidjson/include/
+    ${PNG_INCLUDE_DIR}
+    3rdparty/glfw/include
+	3rdparty/glm/
+    3rdparty/rapidjson/include/
     )
 add_subdirectory (engine)
 add_subdirectory (game)

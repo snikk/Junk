@@ -1,9 +1,9 @@
 #include "Level.h"
 
-#include "../io/Error.h"
+#include <io/Error.h>
 #include <fstream>
 #include <iostream>
-#include "../io/ResourceManager.h"
+#include <io/ResourceManager.h>
 
 Level::Level(const std::string& fileName, Shader* shader) {
 

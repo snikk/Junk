@@ -1,5 +1,5 @@
 #include "Agent.h"
-#include "../io/ResourceManager.h"
+#include <io/ResourceManager.h>
 #include "Level.h"
 #include <algorithm>
 

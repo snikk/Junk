@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "../drawing/SpriteBatch.h"
-#include "../shader/Shader.h"
+#include <drawing/SpriteBatch.h>
+#include <shader/Shader.h>
 
 const int TILE_WIDTH = 64;
 

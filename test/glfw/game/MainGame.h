@@ -1,9 +1,9 @@
 #ifndef __MAIN_GAME_H__
 #define __MAIN_GAME_H__
 
-#include "io/Window.h"
-#include "drawing/Camera.h"
-#include "shader/Shader.h"
+#include <io/Window.h>
+#include <drawing/Camera.h>
+#include <shader/Shader.h>
 
 #include "zombie/Player.h"
 #include "zombie/Level.h"

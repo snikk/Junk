@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Human.h"
-#include "../io/InputManager.h"
-#include "../drawing/Camera.h"
+#include <io/InputManager.h>
+#include <drawing/Camera.h>
 #include "Bullet.h"
 
 class Gun;
