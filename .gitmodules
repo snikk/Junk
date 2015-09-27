@@ -1,0 +1,6 @@
+[submodule "test/glfw/3rdparty/glm"]
+	path = test/glfw/3rdparty/glm
+	url = git@github.com:g-truc/glm.git
+[submodule "test/glfw/3rdparty/glfw"]
+	path = test/glfw/3rdparty/glfw
+	url = git@github.com:glfw/glfw.git
