@@ -1,6 +1,7 @@
 #include "SpriteBatch.h"
 #include "../util/util.h"
 #include "../shader/Shader.h"
+#include <algorithm>
 
 SpriteBatch::SpriteBatch() : _vbo(0), _vao(0)
 {

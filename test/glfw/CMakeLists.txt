@@ -10,6 +10,12 @@ endif ()
 set(GLFW_BUILD_EXAMPLES OFF)
 add_subdirectory (3rdparty/glfw)
 find_package(PNG REQUIRED)
+if (WIN32)
+    find_package(GLEW REQUIRED)
+    include_directories(${GLEW_INCLUDE_DIRS})
+    link_libraries(${GLEW_LIBRARIES})
+endif()
+	
 include_directories (
     ${PNG_INCLUDE_DIR}
     3rdparty/glfw/include

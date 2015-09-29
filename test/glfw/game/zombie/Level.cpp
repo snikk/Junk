@@ -12,11 +12,14 @@ Level::Level(const std::string& fileName, Shader* shader) {
 
     // Error checking
     if (file.fail()) {
+		/*
         int size = 16 + fileName.size();
         char *name = (char*) malloc(size);
         name[size] = '\0';
         snprintf(name, size, "Failed to open %s", fileName.c_str());
-        fatalError(name);
+		*/
+		std::string message = "Failed to open " + fileName;
+        fatalError(message.c_str());
     }
 
     // Throw away the first string in tmp

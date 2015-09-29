@@ -1,8 +1,7 @@
 #ifndef __SHADER_H__
 #define __SHADER_H__
 
-//#define GLFW_INCLUDE_GLCOREARB
-#include <GLFW/glfw3.h>
+#include <common.h>
 #include <unordered_map>
 
 class Shader {

@@ -1,10 +1,6 @@
 #include "Util.h"
 #include <stdio.h>
-
-#ifdef __APPLE__
-#define GLFW_INCLUDE_GLCOREARB
-#endif
-#include <GLFW/glfw3.h>
+#include <common.h>
 
 void checkError(const char* msg) {
     checkError(msg, "NO_FILE", 0);

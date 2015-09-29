@@ -1,12 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
 #include <png.h>
-
-#ifdef __APPLE__
-#define GLFW_INCLUDE_GLCOREARB
-#endif
-#include <GLFW/glfw3.h>
 #include "../util/Util.h"
 #include "ImageLoader.h"
 #include "IOManager.h"

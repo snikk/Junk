@@ -29,7 +29,16 @@ bool Window::init(const char* name, int width, int height, GLFWmonitor* monitor,
         return false;
     }
 
-    glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(window);
+
+#ifdef _WIN32
+	GLenum err = glewInit();
+	if (GLEW_OK != err) {
+		printf("Error: %s\n", glewGetErrorString(err));
+		glfwTerminate();
+		return 1;
+	}
+#endif
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

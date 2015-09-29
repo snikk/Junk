@@ -16,6 +16,11 @@
 //#include <rapidjson/writer.h>
 //#include <rapidjson/stringbuffer.h>
 
+#ifndef __APPLE__
+#include <GL/glew.h>
+#endif
+
+#include "common.h"
 #include "MainGame.h"
 
 void jsonTest();

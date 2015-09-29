@@ -12,6 +12,12 @@
 #include "zombie/Zombie.h"
 #include <util/Util.h>
 
+#ifdef _WIN32
+#include <chrono>
+#include <thread>
+#define M_PI 3.14159265359
+#endif
+
 const float RADIANS = M_PI / 180.0;
 
 const float HUMAN_SPEED = 1.0f;
@@ -160,7 +166,11 @@ void MainGame::gameLoop() {
         float renderTime = glfwGetTime() - newTime;
         long totalSleepTime = (US_PER_SECOND / DESIRED_FPS) - (US_PER_SECOND * renderTime);
         if (totalSleepTime > 0) {
-            usleep(totalSleepTime);
+#ifdef _WIN32
+			std::this_thread::sleep_for(std::chrono::microseconds(totalSleepTime));
+#else
+			usleep(totalSleepTime);
+#endif
         }
     }
 }
