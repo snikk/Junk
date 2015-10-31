@@ -13,7 +13,10 @@ add_executable (
     zombie/Zombie.cpp
     )
 
+set(CMAKE_BUILD_TYPE Debug)
+
 message (${CMAKE_CURRENT_BINARY_DIR})
+add_custom_command (TARGET zombieGame PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources/actor/ ${CMAKE_CURRENT_BINARY_DIR}/actor/)
 add_custom_command (TARGET zombieGame PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources/images/ ${CMAKE_CURRENT_BINARY_DIR}/images/)
 add_custom_command (TARGET zombieGame PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources/level/ ${CMAKE_CURRENT_BINARY_DIR}/level/)
 add_custom_command (TARGET zombieGame PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/ ${CMAKE_CURRENT_BINARY_DIR}/shader/)

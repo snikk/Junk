@@ -3,7 +3,9 @@
 #include <random>
 #include <glm/gtx/rotate_vector.hpp>
 
+#ifndef M_PI
 # define M_PI           3.14159265358979323846
+#endif
 const double RADIANS = M_PI / 180.0;
 
 Human::Human() :

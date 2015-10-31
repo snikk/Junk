@@ -9,6 +9,10 @@
 #include "zombie/Level.h"
 #include "zombie/Bullet.h"
 
+#include <actor/Actor.h>
+#include <actor/ActorFactory.h>
+#include <actor/ActorComponent.h>
+
 enum class GameState {
     PLAY, 
     EXIT
@@ -50,9 +54,9 @@ private:
     int _currentLevel;                                                                      
 
     Player* _player;                                                                        
-    std::vector<Human*> _humans; ///< Vector of all humans                                  
-    std::vector<Zombie*> _zombies; ///< Vector of all zombies                               
-    std::vector<Bullet> _bullets;                                                           
+    std::vector<StrongActorPtr> _humans; ///< Vector of all humans                                  
+    std::vector<StrongActorPtr> _zombies; ///< Vector of all zombies                               
+    std::vector<StrongActorPtr> _bullets;                                                           
 
     int _numHumansKilled; ///< Humans killed by player                                      
     int _numZombiesKilled; ///< Zombies killed by player                                    

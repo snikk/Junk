@@ -6,6 +6,8 @@
 #include <io/Error.h>
 #include <common.h>
 
+//#include <actor/ActorFactory.h>
+
 #include <iostream>
 
 #include "zombie/Gun.h"
@@ -17,6 +19,8 @@
 #include <thread>
 #define M_PI 3.14159265359
 #endif
+
+#include <actor/components/PositionComponent.h>
 
 const float RADIANS = M_PI / 180.0;
 
@@ -34,6 +38,7 @@ MainGame::MainGame() :
     _numZombiesKilled(0) {}
 
 MainGame::~MainGame() {
+    /*
     // Don't forget to delete the levels!                                                              
     for (int i = 0; i < _levels.size(); i++) {                                                         
         delete _levels[i];                                                                             
@@ -45,9 +50,11 @@ MainGame::~MainGame() {
     for (int i = 0; i < _zombies.size(); i++) {                                                        
         delete _zombies[i];                                                                            
     } 
+    */
 }
 
 void MainGame::run() {
+    //StrongActorPtr actor = CreateActor("actor/test.json");
     initSystems();
     initLevel();
     gameLoop();
@@ -66,6 +73,19 @@ void MainGame::initSystems() {
 }
 
 void MainGame::initLevel() {
+    ActorFactory factory;
+    StrongActorPtr actor = factory.CreateActor("actor/test.json");
+
+    
+    std::weak_ptr<PositionComponent> pWeakPickup = actor->GetComponent<PositionComponent>(PositionComponent::COMPONENT_ID);
+    std::shared_ptr<PositionComponent> pPosition = MakeStrongPtr(pWeakPickup);
+    if (pPosition) {
+        printf("Hey got the position!? | x = %f | y = %f | z = %f\n", pPosition->x, pPosition->y, pPosition->z);
+    } else {
+        printf("An error!!!! well I never.\n");
+    }
+
+    /*
     _levels.push_back(new Level("level/level1.txt", &_textureProgram));
     _currentLevel = 0;
 
@@ -99,6 +119,7 @@ void MainGame::initLevel() {
     _player->addGun(new Gun("Magnum", 10, 1, 5.0f * RADIANS, 30, BULLET_SPEED));
     _player->addGun(new Gun("Shotgun", 30, 12, 20.0f * RADIANS, 4, BULLET_SPEED));
     _player->addGun(new Gun("MP5", 2, 1, 10.0f * RADIANS, 20, BULLET_SPEED));
+    */
 }
 
 void MainGame::initShaders() {
@@ -109,6 +130,7 @@ void MainGame::initShaders() {
 }
 
 void MainGame::gameLoop() {
+    /*
     // Some helpful constants.
     const float DESIRED_FPS = 60.0f; // FPS the game is designed to run at
     const int MAX_PHYSICS_STEPS = 6; // Max number of physics steps per frame
@@ -173,9 +195,11 @@ void MainGame::gameLoop() {
 #endif
         }
     }
+    */
 }
 
 void MainGame::updateAgents(float deltaTime) {
+    /*
     // Update all humans
     for (int i = 0; i < _humans.size(); i++) {
         _humans[i]->update(_levels[_currentLevel]->getLevelData(),
@@ -233,9 +257,11 @@ void MainGame::updateAgents(float deltaTime) {
     }
 
     // Dont forget to update zombies
+    */
 }
 
 void MainGame::updateBullets(float deltaTime) {
+    /*
     // Update and collide with world
     for (int i = 0; i < _bullets.size(); ) {
         // If update returns true, the bullet collided with a wall
@@ -306,9 +332,11 @@ void MainGame::updateBullets(float deltaTime) {
             }
         }
     }
+    */
 }
 
 void MainGame::checkVictory() {
+    /*
     // TODO: Support for multiple levels!
     // _currentLevel++; initLevel(...);
 
@@ -321,6 +349,7 @@ void MainGame::checkVictory() {
         // Easy way to end the game :P
         fatalError("");
     }
+    */
 }
 
 void MainGame::processInput() {
@@ -330,6 +359,7 @@ void MainGame::processInput() {
 }
 
 void MainGame::drawGame() {
+    /*
     // Set the base depth to 1.0
     glClearDepth(1.0);
     CHK_ERR("glClearDepth");
@@ -398,5 +428,6 @@ void MainGame::drawGame() {
 
     // Swap our buffer and draw everything to the screen!
     _window.swapBuffers();
+    */
 }
 

@@ -1,6 +1,13 @@
 add_library (
     engine
 
+    common.cpp
+
+    actor/actor.cpp
+    actor/ActorFactory.cpp
+    actor/components/Pickup.cpp
+    actor/components/PositionComponent.cpp
+
     drawing/Camera.cpp
     drawing/SpriteBatch.cpp
 
@@ -12,11 +19,11 @@ add_library (
     io/TextureCache.cpp
     io/Window.cpp
 
-    memory/MemoryPool.cpp
-
     shader/Shader.cpp
 
     util/Util.cpp
     )
+
+set(CMAKE_BUILD_TYPE Debug)
 
 target_include_directories (engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
