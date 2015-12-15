@@ -5,6 +5,9 @@
 #include <io/InputManager.h>
 #include <io/Error.h>
 #include <common.h>
+#include <network/Network.h>
+#include <events/EngineEvents.h>
+#include <events/EventManager.h>
 
 //#include <actor/ActorFactory.h>
 
@@ -22,11 +25,40 @@
 
 #include <actor/components/PositionComponent.h>
 
+#include "zombie/events/Events.h"
+
 const float RADIANS = M_PI / 180.0;
 
 const float HUMAN_SPEED = 1.0f;
 const float ZOMBIE_SPEED = 1.3f;
 const float PLAYER_SPEED = 5.0f;
+
+NetworkEventForwarder* g_pForwarder;
+
+void destroyActorDelegate(IEventDataPtr pEventData) {
+    std::shared_ptr<EvtData_Destroy_Actor> pCastEventData = std::static_pointer_cast<EvtData_Destroy_Actor>(pEventData);
+
+    printf("Hey here we are. | pCastEventData->GetId() = %u\n", pCastEventData->GetId());
+}
+
+void addNewRemoteSocket(IEventDataPtr pEventData) {
+    std::shared_ptr<EvtData_Remote_Client> pCastEventData = std::static_pointer_cast<EvtData_Remote_Client>(pEventData);
+
+    printf("Hey.  I got a new Client!\n");
+    const int sockID = pCastEventData->GetSocketId();
+    const int ipAddress = pCastEventData->GetIpAddress();
+
+    std::ostrstream out;
+
+    out << static_cast<int>(RemoteEventSocket::NetMsg_PlayerLoginOk) << " ";
+    out << sockID << " ";
+    out << 20 << " ";
+    out << 123 << " ";
+    out << "\r\n";
+
+    std::shared_ptr<BinaryPacket> gvidMsg(GCC_NEW BinaryPacket(out.rdbuf()->str(), (u_long)out.pcount()));
+    BaseSocketManager::Get()->Send(sockID, gvidMsg);
+}
 
 MainGame::MainGame() :                                                                                
     _screenWidth(1280),
@@ -61,6 +93,8 @@ void MainGame::run() {
 }
 
 void MainGame::initSystems() {
+    GCC_NEW EventManager("Main EventManager", true);
+
     _window.init("Hey ho!", _screenWidth, _screenHeight, NULL, NULL);
     glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
     initShaders();
@@ -73,6 +107,34 @@ void MainGame::initSystems() {
 }
 
 void MainGame::initLevel() {
+    long ticks = getTicks();
+    printf("getTicks() = %lu\n", ticks);
+
+    printf("EvtData_Destroy_Actor::sk_EventType = %lu\n", EvtData_Destroy_Actor::sk_EventType);
+
+    IEventManager::Get()->VAddListener(&destroyActorDelegate, EvtData_Destroy_Actor::sk_EventType);
+    /*
+    IEventManager::Get()->VAddListener(&destroyActorDelegate, EvtData_Destroy_Actor::sk_EventType);
+
+    std::shared_ptr<EvtData_Destroy_Actor> pDestroyActorData1(GCC_NEW EvtData_Destroy_Actor(1));
+    std::shared_ptr<EvtData_Destroy_Actor> pDestroyActorData2(GCC_NEW EvtData_Destroy_Actor(12));
+    std::shared_ptr<EvtData_Destroy_Actor> pDestroyActorData3(GCC_NEW EvtData_Destroy_Actor(123));
+    std::shared_ptr<EvtData_Destroy_Actor> pDestroyActorData4(GCC_NEW EvtData_Destroy_Actor(1234));
+    std::shared_ptr<EvtData_Destroy_Actor> pDestroyActorData5(GCC_NEW EvtData_Destroy_Actor(12345));
+    std::shared_ptr<EvtData_Destroy_Actor> pDestroyActorData6(GCC_NEW EvtData_Destroy_Actor(123456));
+
+    IEventManager::Get()->VQueueEvent(pDestroyActorData1);
+    IEventManager::Get()->VQueueEvent(pDestroyActorData2);
+    IEventManager::Get()->VQueueEvent(pDestroyActorData3);
+    IEventManager::Get()->VQueueEvent(pDestroyActorData4);
+    IEventManager::Get()->VQueueEvent(pDestroyActorData5);
+    IEventManager::Get()->VQueueEvent(pDestroyActorData6);
+
+    printf("Here we are before the update call\n");
+    IEventManager::Get()->VTickVUpdate();
+    printf("After the update call?\n");
+    */
+
     ActorFactory factory;
     StrongActorPtr actor = factory.CreateActor("actor/test.json");
 
@@ -130,6 +192,54 @@ void MainGame::initShaders() {
 }
 
 void MainGame::gameLoop() {
+    REGISTER_EVENT(EvtData_Destroy_Actor);
+
+    printf("game loop begins!\n");
+    BaseSocketManager* baseSocketManager = GCC_NEW BaseSocketManager;
+    GameServerListenSocket* listenSocket = GCC_NEW GameServerListenSocket(7788);
+    baseSocketManager->AddSocket(listenSocket);
+
+    IEventManager::Get()->VAddListener(&addNewRemoteSocket, EvtData_Remote_Client::sk_EventType);
+
+    ClientSocketManager* pClient = GCC_NEW ClientSocketManager("127.0.0.1", 7788);
+
+    g_pForwarder = GCC_NEW NetworkEventForwarder(0);
+    IEventManager* pEvent = IEventManager::Get();
+
+    pEvent->VAddListener(fastdelegate::MakeDelegate(g_pForwarder, &NetworkEventForwarder::ForwardEvent), EvtData_Destroy_Actor::sk_EventType);
+
+    int id = 0;
+
+    if (!pClient->Connect()) {
+        GCC_ERROR("Couldn't attach to game server.\n");
+    }
+
+    while (_gameState == GameState::PLAY) {
+        //printf("-------------Start frame--------------\n");
+        baseSocketManager->DoSelect(0);
+        pClient->DoSelect(0);
+
+        /*
+        if (id < 10 && g_pForwarder != NULL) {
+            std::shared_ptr<EvtData_Destroy_Actor> pDestroyActorData(GCC_NEW EvtData_Destroy_Actor(id++));
+
+            IEventManager::Get()->VQueueEvent(pDestroyActorData);
+        }
+        */
+
+        IEventManager::Get()->VTickVUpdate();
+
+        processInput();
+
+#ifdef _WIN32
+    	std::this_thread::sleep_for(std::chrono::microseconds(30000));
+#else
+		usleep(30000);
+#endif
+    }
+
+    delete baseSocketManager;
+
     /*
     // Some helpful constants.
     const float DESIRED_FPS = 60.0f; // FPS the game is designed to run at

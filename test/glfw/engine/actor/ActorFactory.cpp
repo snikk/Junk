@@ -2,6 +2,7 @@
 #include "../common.h"
 #include "components/Pickup.h"
 #include "components/PositionComponent.h"
+#include "components/HealthComponent.h"
 #include "../io/IOManager.h"
 
 template<class Allocator>
@@ -31,6 +32,7 @@ ActorFactory::ActorFactory(void) {
     m_actorComponentCreators["AmmoPickup"] = CreateAmmoPickup;
     m_actorComponentCreators["HealthPickup"] = CreateHealthPickup;
     m_actorComponentCreators["Position"] = CreatePosition;
+    m_actorComponentCreators["Health"] = CreateHealth;
 }
 
 StrongActorPtr ActorFactory::CreateActor(const char* actorResource) {

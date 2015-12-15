@@ -7,9 +7,15 @@ add_library (
     actor/ActorFactory.cpp
     actor/components/Pickup.cpp
     actor/components/PositionComponent.cpp
+    actor/components/HealthComponent.cpp
 
     drawing/Camera.cpp
     drawing/SpriteBatch.cpp
+
+    events/EngineEvents.cpp
+    events/EventManager.cpp
+
+    network/Network.cpp
 
     io/Error.cpp
     io/ImageLoader.cpp

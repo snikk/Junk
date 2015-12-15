@@ -21,6 +21,7 @@ include_directories (
     3rdparty/glfw/include
 	3rdparty/glm/
     3rdparty/rapidjson/include/
+    3rdparty/fastdelegate/
     )
 add_subdirectory (engine)
 add_subdirectory (game)

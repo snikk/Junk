@@ -11,6 +11,8 @@ add_executable (
     zombie/Level.cpp
     zombie/Player.cpp
     zombie/Zombie.cpp
+
+    zombie/events/Events.cpp
     )
 
 set(CMAKE_BUILD_TYPE Debug)

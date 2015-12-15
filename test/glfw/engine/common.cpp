@@ -45,3 +45,44 @@ void printObj(const rapidjson::Value& data) {
     }
 }
 
+extern long getTicks() {
+    auto start = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(start.time_since_epoch()).count();
+}
+
+extern long timeGetTime() {
+    auto start = std::chrono::system_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(start.time_since_epoch()).count();
+}
+
+extern void* ZeroMemory(void* ptr, size_t num) {
+    return memset(ptr, 0, num);
+}
+
+extern int WSAStartup(WORD wVersionRequested, LPWSADATA lpWSAData) {
+    return 0;
+}
+
+extern int WSACleanup() {
+    return 0;
+}
+
+extern int WSAGetLastError() {
+    if (errno == EWOULDBLOCK)
+        return WSAEWOULDBLOCK;
+
+    return errno;
+}
+
+extern int closesocket(SOCKET sock) {
+    return close(sock);
+}
+
+extern std::string ToStr(int num, int base) {
+    char str[33];
+    memset(str, 0, 33);
+    snprintf(str, 33, "%d(%d)", num, base);
+
+    return (std::string(str));
+}
+

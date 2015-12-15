@@ -8,6 +8,10 @@
         "y": 456.0
     },
     {
+        "type": "Health", 
+        "health": 444.0
+    },
+    {
         "type": "control"
     },
     {
