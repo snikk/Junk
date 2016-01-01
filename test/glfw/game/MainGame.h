@@ -12,6 +12,7 @@
 #include <actor/Actor.h>
 #include <actor/ActorFactory.h>
 #include <actor/ActorComponent.h>
+#include <debug/DebugView.h>
 
 enum class GameState {
     PLAY, 
@@ -44,6 +45,7 @@ private:
     Camera2D _camera; ///< Main Camera                                             
 
     SpriteBatch _agentSpriteBatch; ///< Draws all agents                           
+    DebugView _debugView;
     
     std::vector<Level*> _levels; ///< vector of all levels                                  
 

@@ -10,18 +10,31 @@ struct Texture {
 };
 
 struct Position {
-    float x;
-    float y;
+    GLfloat x;
+    GLfloat y;
+
+    void set(GLfloat xPos, GLfloat yPos) {
+        x = xPos;
+        y = yPos;
+    }
 };
 
 struct ColorRGBA8 {
     ColorRGBA8() : r(0), g(0), b(0), a(0) { }
     ColorRGBA8(GLubyte R, GLubyte G, GLubyte B, GLubyte A) :
         r(R), g(G), b(B), a(A) { }
+    ColorRGBA8(int color) { set(color); }
     GLubyte r;
     GLubyte g;
     GLubyte b;
     GLubyte a;
+
+    void set(int color) {  
+        a = (color >> 24) & 0xFF;
+        r = (color >> 16) & 0xFF;
+        g = (color >> 8) & 0xFF;
+        b = color & 0xFF;
+    }
 };
 
 struct UV {

@@ -38,7 +38,7 @@ void InputManager::releaseKey(unsigned int keyID) {
 void InputManager::setMouseCoords(float x, float y) {
     _mouseCoords.x = x;
     _mouseCoords.y = y;
-    printf("Set mouse | x = %f | y = %f\n", _mouseCoords.x, _mouseCoords.y);
+    //printf("Set mouse | x = %f | y = %f\n", _mouseCoords.x, _mouseCoords.y);
 }
 
 /// Returns true if the key is held down

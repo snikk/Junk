@@ -113,6 +113,9 @@ void MainGame::initLevel() {
     printf("EvtData_Destroy_Actor::sk_EventType = %lu\n", EvtData_Destroy_Actor::sk_EventType);
 
     IEventManager::Get()->VAddListener(&destroyActorDelegate, EvtData_Destroy_Actor::sk_EventType);
+
+    _debugView.init();
+    CHK_ERR("Debug View Init");
     /*
     IEventManager::Get()->VAddListener(&destroyActorDelegate, EvtData_Destroy_Actor::sk_EventType);
 
@@ -214,7 +217,16 @@ void MainGame::gameLoop() {
         GCC_ERROR("Couldn't attach to game server.\n");
     }
 
+    glm::mat4 projection = glm::mat4();
+    float xScale = (float) _window.height / (float) _window.width;
+    projection = glm::scale(projection, glm::vec3(xScale, -1.0f, 1.0f));
+
     while (_gameState == GameState::PLAY) {
+        glClearDepth(1.0);
+        CHK_ERR("glClearDepth");
+        // Clear the color and depth buffer
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         //printf("-------------Start frame--------------\n");
         baseSocketManager->DoSelect(0);
         pClient->DoSelect(0);
@@ -227,14 +239,61 @@ void MainGame::gameLoop() {
         }
         */
 
+        _debugView.clear();
+        _debugView.setColor(0xFF00FF00);
+        _debugView.move(0.1 * _window.width, 0.1 * _window.height);
+        _debugView.lineTo(0.2 * _window.width, 0.25 * _window.height);
+        _debugView.lineTo(0.2 * _window.width, -0.25 * _window.height);
+        _debugView.lineTo(-0.2 * _window.width, 0.25 * _window.height);
+        _debugView.lineTo(-0.2 * _window.width, -0.25 * _window.height);
+
+        _debugView.move(0.6 * _window.width, 0.7 * _window.height, 0xFFFFFFFF);
+        _debugView.lineTo(-0.6 * _window.width, 0.7 * _window.height, 0xFFFF0000);
+        _debugView.curveTo(-0.7 * _window.width, 0.7 * _window.height, -0.7 * _window.width, 0.6 * _window.height);
+        _debugView.lineTo(-0.7 * _window.width, -0.6 * _window.height);
+        _debugView.curveTo(-0.7 * _window.width, -0.7 * _window.height, -0.6 * _window.width, -0.7 * _window.height);
+        _debugView.lineTo(0.6 * _window.width, -0.7 * _window.height);
+        _debugView.curveTo(0.7 * _window.width, -0.7 * _window.height, 0.7 * _window.width, -0.6 * _window.height);
+        _debugView.lineTo(0.7 * _window.width, 0.6 * _window.height);
+        _debugView.curveTo(0.7 * _window.width, 0.7 * _window.height, 0.6 * _window.width, 0.7 * _window.height);
+        
+        //_camera.setScale(1.0f / 4.0f);
+        //_camera.setScale(1.0f / 4.0f);
+        //_camera.setPosition(InputManager::instance().getMouseCoords());
+        _camera.setPosition(glm::vec2(_window.width / 2.0f, _window.height / 2.0f));
+        _camera.update();
+
+        glm::vec2 screen = (InputManager::instance().getMouseCoords() / glm::vec2(_window.width, _window.height)) * 2.0f - 1.0f;
+        screen.y *= -1;
+
+        glm::vec4 mouse = _camera.getInverseMatrix() * glm::vec4(screen, 0.0f, 1.0f);
+
+        _debugView.move(1.0 * _window.width, 1.0 * _window.height, 0xFF0000FF);
+        _debugView.curveTo(mouse.x, mouse.y, 1.0 * _window.width, -1.0 * _window.height);
+        _debugView.curveTo(mouse.x, mouse.y, -1.0 * _window.width, -1.0 * _window.height);
+        _debugView.curveTo(mouse.x, mouse.y, -1.0 * _window.width, 1.0 * _window.height);
+        _debugView.curveTo(mouse.x, mouse.y, 1.0 * _window.width, 1.0 * _window.height);
+
+        _debugView.move(0.0f, 0.0f, 0xFF00FFFF);
+        _debugView.lineTo(_window.width, _window.height);
+        _debugView.curveTo(0.0f, _window.height, 0.0f, 0.0f);
+        _debugView.curveTo(_window.width, 0.0f, _window.width, _window.height);
+
+        _debugView.move(0.0f, 0.0f, 0xFF000000);
+        _debugView.lineTo(mouse.x, mouse.y);
+
+        _debugView.draw(_camera.getCameraMatrix());
+
         IEventManager::Get()->VTickVUpdate();
 
         processInput();
 
+        _window.swapBuffers();
+
 #ifdef _WIN32
-    	std::this_thread::sleep_for(std::chrono::microseconds(30000));
+    	std::this_thread::sleep_for(std::chrono::microseconds(16000));
 #else
-		usleep(30000);
+		usleep(16000);
 #endif
     }
 

@@ -10,10 +10,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         Log.d("B201", "local ip = " + getLocalIpAddress());
+
+        new Thread(listen).start();
+        new Thread(sender).start();
     }
 
     public String getLocalIpAddress() {
@@ -51,14 +57,14 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    public static String getBroadcast() throws SocketException {
+    public static InetAddress getBroadcast() throws SocketException {
         System.setProperty("java.net.preferIPv4Stack", "true");
         for (Enumeration<NetworkInterface> niEnum = NetworkInterface.getNetworkInterfaces(); niEnum.hasMoreElements();) {
             NetworkInterface ni = niEnum.nextElement();
             if (!ni.isLoopback()) {
                 for (InterfaceAddress interfaceAddress : ni.getInterfaceAddresses()) {
                     if (interfaceAddress.getBroadcast() != null)
-                        return interfaceAddress.getBroadcast().toString();
+                        return interfaceAddress.getBroadcast();
                 }
             }
         }
@@ -77,6 +83,61 @@ public class MainActivity extends AppCompatActivity {
 
         return InetAddress.getByAddress(quads);
     }
+
+    Runnable listen = new Runnable() {
+        @Override
+        public void run() {
+            DatagramSocket server = null;
+            try {
+                server = new DatagramSocket(3378, getBroadcastAddress());
+                server.setBroadcast(true);
+
+                byte[] buf = new byte[512];
+                DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                while (!server.isClosed()) {
+                    server.receive(packet);
+                    byte[] incoming = packet.getData();
+                    Log.d("B201", "Data = " + new String(incoming, 0, packet.getLength()));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (server != null)
+                    server.close();
+            }
+        }
+    };
+
+    Runnable sender = new Runnable() {
+        @Override
+        public void run() {
+            DatagramSocket sock = null;
+            try {
+                sock = new DatagramSocket(3378, getBroadcast());
+                sock.setBroadcast(true);
+                int curr = 0;
+                while (true) {
+                    byte[] bytes = ("Sending packet: " + curr++).getBytes();
+                    Log.d("B201", "Sending packet.");
+                    DatagramPacket data = new DatagramPacket(bytes, bytes.length);
+                    sock.send(data);
+
+                    Thread.sleep(1000);
+                }
+            } catch (SocketException e) {
+                e.printStackTrace();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                if (sock != null)
+                    sock.close();
+            }
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

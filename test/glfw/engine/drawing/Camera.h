@@ -30,6 +30,7 @@ public:
 
     float getScale() { return _scale; }
     glm::mat4 getCameraMatrix() { return _cameraMatrix; }
+    glm::mat4 getInverseMatrix() { return _cameraMatrixInverse; }
 
 private:               
     int _screenWidth, _screenHeight;
@@ -37,6 +38,7 @@ private:
     float _scale;      
     glm::vec2 _position;
     glm::mat4 _cameraMatrix;        
+    glm::mat4 _cameraMatrixInverse;        
     glm::mat4 _orthoMatrix;
 };
 

@@ -16,7 +16,10 @@ add_executable (
     )
 
 set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
+message ("This is the output!!!!!!!!!!!!!!!!")
+message (${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 message (${CMAKE_CURRENT_BINARY_DIR})
 add_custom_command (TARGET zombieGame PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources/actor/ ${CMAKE_CURRENT_BINARY_DIR}/actor/)
 add_custom_command (TARGET zombieGame PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/resources/images/ ${CMAKE_CURRENT_BINARY_DIR}/images/)

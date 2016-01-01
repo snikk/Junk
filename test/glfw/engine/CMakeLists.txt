@@ -9,6 +9,8 @@ add_library (
     actor/components/PositionComponent.cpp
     actor/components/HealthComponent.cpp
 
+    debug/DebugView.cpp
+
     drawing/Camera.cpp
     drawing/SpriteBatch.cpp
 
