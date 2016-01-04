@@ -60,29 +60,23 @@ void addNewRemoteSocket(IEventDataPtr pEventData) {
     BaseSocketManager::Get()->Send(sockID, gvidMsg);
 }
 
-MainGame::MainGame() :                                                                                
+MainGame::MainGame() :
     _screenWidth(1280),
     _screenHeight(960),
     _gameState(GameState::PLAY),
     _fps(0),
     _player(nullptr),
-    _numHumansKilled(0),                                                                               
+    _numHumansKilled(0),
     _numZombiesKilled(0) {}
 
 MainGame::~MainGame() {
-    /*
-    // Don't forget to delete the levels!                                                              
-    for (int i = 0; i < _levels.size(); i++) {                                                         
-        delete _levels[i];                                                                             
-    }                                                                                                  
-    // Don't forget to delete the humans and zombies!                                                  
-    for (int i = 0; i < _humans.size(); i++) {                                                         
-        delete _humans[i];                                                                             
-    }                                                                                                  
-    for (int i = 0; i < _zombies.size(); i++) {                                                        
-        delete _zombies[i];                                                                            
-    } 
-    */
+    // Don't forget to delete the levels!
+    for (int i = 0; i < _levels.size(); i++) {
+        delete _levels[i];
+    }
+
+    // Don't forget to delete the humans and zombies!
+    _actors.clear();
 }
 
 void MainGame::run() {
@@ -150,12 +144,11 @@ void MainGame::initLevel() {
         printf("An error!!!! well I never.\n");
     }
 
-    /*
     _levels.push_back(new Level("level/level1.txt", &_textureProgram));
     _currentLevel = 0;
 
     _player = new Player();
-    _player->init(PLAYER_SPEED, _levels[_currentLevel]->getStartPlayerPos(), &_camera, &_bullets);
+    _player->init(PLAYER_SPEED, _levels[_currentLevel]->getStartPlayerPos(), &_camera);
 
     _humans.push_back(_player);
 
@@ -167,16 +160,16 @@ void MainGame::initLevel() {
 
     // Add all the random humans
     for (int i = 0; i < _levels[_currentLevel]->getNumHumans(); i++) {
-        _humans.push_back(new Human);
+        _actors.push_back(new Human);
         glm::vec2 pos(randX(randomEngine) * TILE_WIDTH, randY(randomEngine) * TILE_WIDTH);
-        _humans.back()->init(HUMAN_SPEED, pos);
+        _actors.back()->init(HUMAN_SPEED, pos);
     }
 
     // Add the zombies
     const std::vector<glm::vec2>& zombiePositions = _levels[_currentLevel]->getZombieStartPositions();
     for (int i = 0; i < zombiePositions.size(); i++) {
-        _zombies.push_back(new Zombie);
-        _zombies.back()->init(ZOMBIE_SPEED, zombiePositions[i], 0.15);
+        _actors.push_back(new Zombie);
+        _actors.back()->init(ZOMBIE_SPEED, zombiePositions[i], 0.15);
     }
 
     // Set up the players guns
@@ -184,7 +177,6 @@ void MainGame::initLevel() {
     _player->addGun(new Gun("Magnum", 10, 1, 5.0f * RADIANS, 30, BULLET_SPEED));
     _player->addGun(new Gun("Shotgun", 30, 12, 20.0f * RADIANS, 4, BULLET_SPEED));
     _player->addGun(new Gun("MP5", 2, 1, 10.0f * RADIANS, 20, BULLET_SPEED));
-    */
 }
 
 void MainGame::initShaders() {

@@ -1,0 +1,43 @@
+:MAIN
+    V_CRT             relView           RELATIVE
+    V_CRT             view1             VIEW
+    V_CRT             view2             VIEW
+    V_CRT             view3             VIEW
+    V_CRT             view4             VIEW
+    V_CRT             view5             VIEW
+
+    V_CHLD            relView           view1
+    V_CHLD            relView           view2
+    V_CHLD            relView           view3
+    V_CHLD            relView           view4
+    V_CHLD            relView           view5
+
+    V_BG_COLOR        view1             0xFF00FF00
+    V_SET_MARGIN      view1             10 10 10 10
+    V_SET_DIMEN       view1             -1 300
+
+    V_BG_COLOR        view2             0xFFFF0000
+    V_SET_MARGIN      view2             5 10 10 90
+    V_SET_DIMEN       view2             20 15
+    V_SET_REL         view2             view1 BELOW
+
+    V_BG_COLOR        view3             0xFF99CC11
+    V_SET_MARGIN      view3             30 30 30 30
+    V_SET_DIMEN       view3             -1 -1
+
+    V_BG_COLOR        view4             0xFFFFFF00
+    V_SET_MARGIN      view4             30 100 90 10
+    V_SET_DIMEN       view4             700 150
+    V_SET_REL         view4             view2 BELOW
+
+    V_BG_COLOR        view5             0x772288FF
+    V_SET_MARGIN      view5             0 0 0 0
+    V_SET_DIMEN       view5             -1 -1
+    V_SET_REL         view5             view4 BELOW
+
+    A_SET_CONTENT     relView
+
+    S_PRINT           "Printing this String"
+    S_PRINT           "Printing another string.  Can this be?"
+
+    RETURN

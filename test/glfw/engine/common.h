@@ -18,6 +18,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <vector>
+#include <list>
 #include <string>
 #include <map>
 #include <memory>

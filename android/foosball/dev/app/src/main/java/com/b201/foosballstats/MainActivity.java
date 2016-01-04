@@ -14,6 +14,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
+import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -58,15 +59,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static InetAddress getBroadcast() throws SocketException {
-        System.setProperty("java.net.preferIPv4Stack", "true");
-        for (Enumeration<NetworkInterface> niEnum = NetworkInterface.getNetworkInterfaces(); niEnum.hasMoreElements();) {
-            NetworkInterface ni = niEnum.nextElement();
-            if (!ni.isLoopback()) {
-                for (InterfaceAddress interfaceAddress : ni.getInterfaceAddresses()) {
-                    if (interfaceAddress.getBroadcast() != null)
-                        return interfaceAddress.getBroadcast();
-                }
-            }
+//        System.setProperty("java.net.preferIPv4Stack", "true");
+//        for (Enumeration<NetworkInterface> niEnum = NetworkInterface.getNetworkInterfaces(); niEnum.hasMoreElements();) {
+//            NetworkInterface ni = niEnum.nextElement();
+//            if (!ni.isLoopback()) {
+//                for (InterfaceAddress interfaceAddress : ni.getInterfaceAddresses()) {
+//                    if (interfaceAddress.getBroadcast() != null)
+//                        return interfaceAddress.getBroadcast();
+//                }
+//            }
+//        }
+
+        try {
+            return InetAddress.getByName("192.168.1.0");
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
 
         return null;
@@ -87,10 +94,12 @@ public class MainActivity extends AppCompatActivity {
     Runnable listen = new Runnable() {
         @Override
         public void run() {
-            DatagramSocket server = null;
+            MulticastSocket server = null;
+            InetAddress addr = null;
             try {
-                server = new DatagramSocket(3378, getBroadcastAddress());
-                server.setBroadcast(true);
+                addr = getBroadcast();
+                server = new MulticastSocket(3378);
+                server.joinGroup(addr);
 
                 byte[] buf = new byte[512];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
@@ -102,8 +111,12 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                if (server != null)
+                if (server != null && addr != null) {
+                    try {
+                        server.leaveGroup(addr);
+                    } catch (IOException e) { }
                     server.close();
+                }
             }
         }
     };
@@ -113,13 +126,16 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             DatagramSocket sock = null;
             try {
-                sock = new DatagramSocket(3378, getBroadcast());
+                Thread.sleep(1000);
+
+                InetAddress addr = getBroadcast();
+                sock = new DatagramSocket(3378);
                 sock.setBroadcast(true);
                 int curr = 0;
                 while (true) {
                     byte[] bytes = ("Sending packet: " + curr++).getBytes();
                     Log.d("B201", "Sending packet.");
-                    DatagramPacket data = new DatagramPacket(bytes, bytes.length);
+                    DatagramPacket data = new DatagramPacket(bytes, bytes.length, addr, 3378);
                     sock.send(data);
 
                     Thread.sleep(1000);

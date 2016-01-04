@@ -1,0 +1,17 @@
+V_CRT             view1             VIEW
+V_CRT             view2             VIEW
+V_CRT             view3             VIEW
+V_CRT             view4             VIEW
+V_CRT             view5             VIEW
+V_CRT             view6             VIEW
+
+V_CHLD            view1             view2
+V_CHLD            view1             view3
+V_CHLD            view1             view4
+V_CHLD            view2             view5
+V_CHLD            view3             view6
+
+V_SET_MARGIN      view1             10 10 10 10
+
+S_PRINT           "Printing this String"
+

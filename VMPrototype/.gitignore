@@ -1,0 +1,59 @@
+# build dirs
+build/
+build_ios/
+build_mac/
+build_win/
+
+#gradle
+.gradle
+
+# gyp + android
+GypAndroid.mk
+*.target.mk
+obj/
+
+# data files
+test_ldb
+test.sqlite
+example.sqlite
+example.sqlite-shm
+example.sqlite-wal
+kv.sqlite
+
+# misc
+.DS_Store
+
+# Xcode
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+
+# AppCode
+.idea/
+
+# QtCreator
+*.config
+*.creator
+*.files
+*.includes
+
+# djinni
+src/interface/
+objc/gen/
+djinni-output-temp/
+
+# android
+libs/
+obj/

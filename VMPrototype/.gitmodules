@@ -1,0 +1,15 @@
+[submodule "deps/optional"]
+	path = deps/optional
+	url = https://github.com/akrzemi1/Optional.git
+[submodule "deps/djinni"]
+	path = deps/djinni
+	url = https://github.com/dropbox/djinni.git
+[submodule "deps/json11"]
+	path = deps/json11
+	url = https://github.com/libmx3/json11.git
+[submodule "deps/xcode-googletest"]
+	path = deps/xcode-googletest
+	url = https://github.com/mattstevens/xcode-googletest.git
+[submodule "deps/gyp"]
+	path = deps/gyp
+	url = https://chromium.googlesource.com/external/gyp.git

@@ -29,10 +29,14 @@ rapidjson::Value * documentToValue(rapidjson::Document & document, Allocator & a
 }
 
 ActorFactory::ActorFactory(void) {
-    m_actorComponentCreators["AmmoPickup"] = CreateAmmoPickup;
-    m_actorComponentCreators["HealthPickup"] = CreateHealthPickup;
-    m_actorComponentCreators["Position"] = CreatePosition;
-    m_actorComponentCreators["Health"] = CreateHealth;
+    RegisterComponent("AmmoPickup", CreateAmmoPickup);
+    RegisterComponent("HealthPickup", CreateHealthPickup);
+    RegisterComponent("Position", CreatePosition);
+    RegisterComponent("Health", CreateHealth);
+}
+
+void ActorFactory::RegisterComponent(std::string name, ActorComponentCreator creator) {
+    m_actorComponentCreators[name] = creator;
 }
 
 StrongActorPtr ActorFactory::CreateActor(const char* actorResource) {

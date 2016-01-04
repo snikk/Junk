@@ -56,9 +56,7 @@ private:
     int _currentLevel;                                                                      
 
     Player* _player;                                                                        
-    std::vector<StrongActorPtr> _humans; ///< Vector of all humans                                  
-    std::vector<StrongActorPtr> _zombies; ///< Vector of all zombies                               
-    std::vector<StrongActorPtr> _bullets;                                                           
+    std::list<StrongActorPtr> _actors; ///< Vector of all actors
 
     int _numHumansKilled; ///< Humans killed by player                                      
     int _numZombiesKilled; ///< Zombies killed by player                                    

@@ -21,6 +21,8 @@ public:
     ActorFactory(void);
     StrongActorPtr CreateActor(const char* actorResource);
 
+    void RegisterComponent(std::string name, ActorComponentCreator creator);
+
 protected:
     virtual StrongActorComponentPtr CreateComponent(const rapidjson::Value& data);
 
