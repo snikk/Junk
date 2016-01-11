@@ -13,6 +13,9 @@
 
 #include <iostream>
 
+#include "zombie/actor/components/Render.h"
+#include "zombie/actor/components/Health.h"
+
 #include "zombie/Gun.h"
 #include "zombie/Zombie.h"
 #include <util/Util.h>
@@ -100,6 +103,15 @@ void MainGame::initSystems() {
     glfwSetKeyCallback(_window.window, InputManager::keyFunction);
 }
 
+void displayPosition(StrongActorPtr pActor) {
+    std::shared_ptr<PositionComponent> pPosition = MakeStrongPtr(pActor->GetComponent<PositionComponent>(PositionComponent::COMPONENT_ID));
+    if (pPosition) {
+        printf("Hey got the position!? | x = %f | y = %f | z = %f\n", pPosition->x, pPosition->y, pPosition->z);
+    } else {
+        printf("An error!!!! well I never.\n");
+    }
+}
+
 void MainGame::initLevel() {
     long ticks = getTicks();
     printf("getTicks() = %lu\n", ticks);
@@ -132,7 +144,7 @@ void MainGame::initLevel() {
     printf("After the update call?\n");
     */
 
-    ActorFactory factory;
+    GameActorFactory factory;
     StrongActorPtr actor = factory.CreateActor("actor/test.json");
 
     
@@ -144,14 +156,35 @@ void MainGame::initLevel() {
         printf("An error!!!! well I never.\n");
     }
 
+    actor->Destroy();
+
+    /*
+    StrongActorPtr player = factory.CreatePlayer();
+    printf("Created the player?  How about that.  If *I* was the player perhaps my ID would be = %u\n", player->GetId());
+    displayPosition(player);
+    StrongActorPtr human = factory.CreateHuman();
+    printf("Created the Human?  How about that.  If *HE* was running from zombies perhaps he would have an ID = %u\n", human->GetId());
+    displayPosition(human);
+    StrongActorPtr zombie = factory.CreateZombie();
+    printf("Created the Zombie?  How about that.  Gross = %u\n", zombie->GetId());
+    displayPosition(zombie);
+
+    player->Destroy();
+    human->Destroy();
+    zombie->Destroy();
+    */
+
     _levels.push_back(new Level("level/level1.txt", &_textureProgram));
     _currentLevel = 0;
 
+    /*
     _player = new Player();
     _player->init(PLAYER_SPEED, _levels[_currentLevel]->getStartPlayerPos(), &_camera);
+    */
 
-    _humans.push_back(_player);
+    _player = factory.CreatePlayer(PLAYER_SPEED, _levels[_currentLevel]->getStartPlayerPos(), &_camera, nullptr);
 
+    /*
     std::mt19937 randomEngine;
     randomEngine.seed(time(nullptr));
 
@@ -177,6 +210,7 @@ void MainGame::initLevel() {
     _player->addGun(new Gun("Magnum", 10, 1, 5.0f * RADIANS, 30, BULLET_SPEED));
     _player->addGun(new Gun("Shotgun", 30, 12, 20.0f * RADIANS, 4, BULLET_SPEED));
     _player->addGun(new Gun("MP5", 2, 1, 10.0f * RADIANS, 20, BULLET_SPEED));
+    */
 }
 
 void MainGame::initShaders() {
@@ -214,10 +248,12 @@ void MainGame::gameLoop() {
     projection = glm::scale(projection, glm::vec3(xScale, -1.0f, 1.0f));
 
     while (_gameState == GameState::PLAY) {
+        // Set the base depth to 1.0
         glClearDepth(1.0);
         CHK_ERR("glClearDepth");
         // Clear the color and depth buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        CHK_ERR("glClear");
 
         //printf("-------------Start frame--------------\n");
         baseSocketManager->DoSelect(0);
@@ -250,10 +286,10 @@ void MainGame::gameLoop() {
         _debugView.curveTo(0.7 * _window.width, 0.7 * _window.height, 0.6 * _window.width, 0.7 * _window.height);
         
         //_camera.setScale(1.0f / 4.0f);
-        //_camera.setScale(1.0f / 4.0f);
+        _camera.setScale(1.0f / 4.0f);
         //_camera.setPosition(InputManager::instance().getMouseCoords());
-        _camera.setPosition(glm::vec2(_window.width / 2.0f, _window.height / 2.0f));
-        _camera.update();
+        //_camera.setPosition(glm::vec2(_window.width / 2.0f, _window.height / 2.0f));
+        //_camera.update();
 
         glm::vec2 screen = (InputManager::instance().getMouseCoords() / glm::vec2(_window.width, _window.height)) * 2.0f - 1.0f;
         screen.y *= -1;
@@ -276,11 +312,62 @@ void MainGame::gameLoop() {
 
         _debugView.draw(_camera.getCameraMatrix());
 
+        _player->Update(1000.0f / 60.0f);
+        auto pPlayerPos = _player->GetComponent<PositionComponent>(PositionComponent::COMPONENT_ID).lock();
+        if (pPlayerPos)
+            _camera.setPosition(glm::vec2(pPlayerPos->x, pPlayerPos->y));
+        _camera.update();
+
+        CHK_ERR("Before use");
+        _textureProgram.use();
+
+        // Draw code goes here
+        glActiveTexture(GL_TEXTURE0);
+        CHK_ERR("glActiveTexture");
+
+        // Make sure the shader uses texture 0
+        GLint textureUniform = _textureProgram.getUniform("mySampler");
+        CHK_ERR("texture");
+        glUniform1i(textureUniform, 0);
+        CHK_ERR("setUniform");
+
+        // Grab the camera matrix
+        glm::mat4 projectionMatrix = _camera.getCameraMatrix();
+        GLint pUniform = _textureProgram.getUniform("P");
+        CHK_ERR("getUniform");
+        glUniformMatrix4fv(pUniform, 1, GL_FALSE, &projectionMatrix[0][0]);
+        CHK_ERR("getUniform");
+
+        // Draw the level
+        _levels[_currentLevel]->draw();
+        CHK_ERR("draw");
+
+        // Begin drawing agents
+        _agentSpriteBatch.begin();
+
+        auto pPlayerRender = _player->GetComponent<RenderComponent>(RenderComponent::COMPONENT_ID).lock();
+        if (pPlayerRender) {
+            pPlayerRender->draw(_agentSpriteBatch);
+        }
+
+        _agentSpriteBatch.end();
+        CHK_ERR("agentSpriteBatchEnd");
+        
+        // Render to the screen
+        _agentSpriteBatch.renderBatch();
+        CHK_ERR("render batches");
+
+        // Unbind the program
+        _textureProgram.unuse();
+        CHK_ERR("unuse");
+
+        // Swap our buffer and draw everything to the screen!
+        _window.swapBuffers();
+
         IEventManager::Get()->VTickVUpdate();
 
         processInput();
-
-        _window.swapBuffers();
+        InputManager::instance().update();
 
 #ifdef _WIN32
     	std::this_thread::sleep_for(std::chrono::microseconds(16000));
@@ -289,6 +376,7 @@ void MainGame::gameLoop() {
 #endif
     }
 
+    _player->Destroy();
     delete baseSocketManager;
 
     /*

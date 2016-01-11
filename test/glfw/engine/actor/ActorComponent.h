@@ -23,7 +23,6 @@ public:
 
     virtual ComponentId VGetId(void) const = 0;
 
-private:
     void SetOwner(StrongActorPtr pOwner) { m_pOwner = pOwner; }
 };
 

@@ -8,9 +8,9 @@
 #include "zombie/Player.h"
 #include "zombie/Level.h"
 #include "zombie/Bullet.h"
+#include "zombie/actor/GameActorFactory.h"
 
 #include <actor/Actor.h>
-#include <actor/ActorFactory.h>
 #include <actor/ActorComponent.h>
 #include <debug/DebugView.h>
 
@@ -55,7 +55,7 @@ private:
 
     int _currentLevel;                                                                      
 
-    Player* _player;                                                                        
+    StrongActorPtr _player;                                                                        
     std::list<StrongActorPtr> _actors; ///< Vector of all actors
 
     int _numHumansKilled; ///< Humans killed by player                                      

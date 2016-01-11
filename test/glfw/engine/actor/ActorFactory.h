@@ -26,7 +26,6 @@ public:
 protected:
     virtual StrongActorComponentPtr CreateComponent(const rapidjson::Value& data);
 
-private:
     ActorId GetNextActorId(void) { ++m_lastActorId; return m_lastActorId; }
 };
 

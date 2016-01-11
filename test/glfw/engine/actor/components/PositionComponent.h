@@ -5,6 +5,7 @@
 
 class PositionComponent : public ActorComponent {
 public:
+    ~PositionComponent() { printf ("Destroyed this Position Component %u\n", VGetId()); }
     const static ComponentId COMPONENT_ID;
 
     virtual bool VInit(const rapidjson::Value& data);
