@@ -8,7 +8,7 @@
 #include "zombie/Player.h"
 #include "zombie/Level.h"
 #include "zombie/Bullet.h"
-#include "zombie/actor/GameActorFactory.h"
+#include "zombie/GameLogic.h"
 
 #include <actor/Actor.h>
 #include <actor/ActorComponent.h>
@@ -62,6 +62,8 @@ private:
     int _numZombiesKilled; ///< Zombies killed by player                                    
 
     GameState _gameState;
+
+    GameLogic _gameLogic;
 };
 
 #endif

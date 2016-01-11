@@ -144,6 +144,7 @@ void MainGame::initLevel() {
     printf("After the update call?\n");
     */
 
+    /*
     GameActorFactory factory;
     StrongActorPtr actor = factory.CreateActor("actor/test.json");
 
@@ -157,6 +158,7 @@ void MainGame::initLevel() {
     }
 
     actor->Destroy();
+    */
 
     /*
     StrongActorPtr player = factory.CreatePlayer();
@@ -182,7 +184,7 @@ void MainGame::initLevel() {
     _player->init(PLAYER_SPEED, _levels[_currentLevel]->getStartPlayerPos(), &_camera);
     */
 
-    _player = factory.CreatePlayer(PLAYER_SPEED, _levels[_currentLevel]->getStartPlayerPos(), &_camera, nullptr);
+    _player = _gameLogic.CreatePlayer(PLAYER_SPEED, _levels[_currentLevel]->getStartPlayerPos(), &_camera, nullptr).lock();
 
     /*
     std::mt19937 randomEngine;

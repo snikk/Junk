@@ -1,12 +1,33 @@
-#include "GameActorFactory.h"
+#include "GameLogic.h"
 #include <actor/components/PositionComponent.h>
-#include "components/Render.h"
-#include "components/Health.h"
-#include "components/AI.h"
+#include "actor/components/Render.h"
+#include "actor/components/Health.h"
+#include "actor/components/AI.h"
 
-/*
-StrongActorPtr GameActorFactory::CreatePlayer(float speed, glm::vec2 pos, Camera2D* camera, std::vector<Bullet>* bullets) {
-    StrongActorPtr pPlayer(GCC_NEW Actor(GetNextActorId()));
+GameLogic::GameLogic() {
+}
+
+GameLogic::~GameLogic() {
+    for (auto it = m_actors.begin(); it != m_actors.end(); ++it)
+        it->second->Destroy();
+    m_actors.clear();
+}
+
+WeakActorPtr GameLogic::VGetActor(const ActorId actorId) {
+    auto it = m_actors.find(actorId);
+    if (it != m_actors.end())
+        return WeakActorPtr(it->second);
+    return WeakActorPtr();
+}
+
+void GameLogic::VDestroyActor(const ActorId actorId) {
+    auto it = m_actors.find(actorId);
+    if (it != m_actors.end())
+        m_actors.erase(it);
+}
+
+WeakActorPtr GameLogic::CreatePlayer(float speed, glm::vec2 pos, Camera2D* camera, std::vector<Bullet>* bullets) {
+    StrongActorPtr pPlayer(m_actorFactory.CreateActor());
 
     std::shared_ptr<PositionComponent> pPosition((PositionComponent *) CreatePosition());
     if (pPosition) {
@@ -61,11 +82,13 @@ StrongActorPtr GameActorFactory::CreatePlayer(float speed, glm::vec2 pos, Camera
 
     pPlayer->PostInit();
 
-    return pPlayer;
+    m_actors.insert(std::make_pair(pPlayer->GetId(), pPlayer));
+
+    return WeakActorPtr(pPlayer);
 }
 
-StrongActorPtr GameActorFactory::CreateHuman() {
-    StrongActorPtr pHuman(GCC_NEW Actor(GetNextActorId()));
+WeakActorPtr GameLogic::CreateHuman() {
+    StrongActorPtr pHuman(m_actorFactory.CreateActor());
 
     std::shared_ptr<PositionComponent> pPosition((PositionComponent *) CreatePosition());
     if (pPosition) {
@@ -82,8 +105,8 @@ StrongActorPtr GameActorFactory::CreateHuman() {
     return pHuman;
 }
 
-StrongActorPtr GameActorFactory::CreateZombie() {
-    StrongActorPtr pZombie(GCC_NEW Actor(GetNextActorId()));
+WeakActorPtr GameLogic::CreateZombie() {
+    StrongActorPtr pZombie(m_actorFactory.CreateActor());
 
     std::shared_ptr<PositionComponent> pPosition((PositionComponent *) CreatePosition());
     if (pPosition) {
@@ -99,5 +122,3 @@ StrongActorPtr GameActorFactory::CreateZombie() {
 
     return pZombie;
 }
-*/
-

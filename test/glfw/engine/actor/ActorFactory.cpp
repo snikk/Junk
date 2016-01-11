@@ -39,6 +39,10 @@ void ActorFactory::RegisterComponent(std::string name, ActorComponentCreator cre
     m_actorComponentCreators[name] = creator;
 }
 
+StrongActorPtr ActorFactory::CreateActor() {
+    return StrongActorPtr(GCC_NEW Actor(GetNextActorId()));
+}
+
 StrongActorPtr ActorFactory::CreateActor(const char* actorResource) {
     const char* json = IOManager::readFile(actorResource);
     rapidjson::Document d;

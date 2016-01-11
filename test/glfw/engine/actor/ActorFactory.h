@@ -20,6 +20,7 @@ protected:
 public:
     ActorFactory(void);
     StrongActorPtr CreateActor(const char* actorResource);
+    StrongActorPtr CreateActor();
 
     void RegisterComponent(std::string name, ActorComponentCreator creator);
 

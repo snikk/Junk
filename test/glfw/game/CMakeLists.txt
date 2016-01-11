@@ -6,13 +6,12 @@ add_executable (
 
     zombie/Agent.cpp
     zombie/Bullet.cpp
+    zombie/GameLogic.cpp
     zombie/Gun.cpp
     zombie/Human.cpp
     zombie/Level.cpp
     zombie/Player.cpp
     zombie/Zombie.cpp
-
-    zombie/actor/GameActorFactory.cpp
 
     zombie/actor/components/AI.cpp
     zombie/actor/components/Health.cpp

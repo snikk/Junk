@@ -38,4 +38,43 @@ public:
     ActorId GetId(void) const { return m_id; }
 };
 
+class EvtData_Fire : public BaseEventData {
+    ActorId m_id;
+    ActorId m_gun;
+
+public:
+    static const EventType sk_EventType;
+
+    explicit EvtData_Fire(ActorId id = -1, ActorId gun = -1) : m_id(id), m_gun(gun) { }
+    explicit EvtData_Fire(std::istrstream& in) {
+        in >> m_id;
+        in >> m_gun;
+    }
+
+    virtual const EventType& VGetEventType(void) const {
+        return sk_EventType;
+    }
+
+    virtual IEventDataPtr VCopy(void) const {
+        return IEventDataPtr(GCC_NEW EvtData_Fire(m_id));
+    }
+
+    virtual void VSerialize(std::ostrstream &out) const {
+        out << m_id;
+        out << m_gun;
+    }
+
+    virtual void VDeserialize(std::istrstream& in) {
+        in >> m_id;
+        in >> m_gun;
+    }
+
+    virtual const char* GetName(void) const {
+        return "EvtData_Fire";
+    }
+
+    ActorId GetOwnerId(void) const { return m_id; }
+    ActorId GetGunId(void) const { return m_gun; }
+};
+
 #endif
