@@ -70,7 +70,8 @@ MainGame::MainGame() :
     _fps(0),
     _player(nullptr),
     _numHumansKilled(0),
-    _numZombiesKilled(0) {}
+    _numZombiesKilled(0), 
+    _camera(GCC_NEW Camera2D) { }
 
 MainGame::~MainGame() {
     // Don't forget to delete the levels!
@@ -92,11 +93,13 @@ void MainGame::run() {
 void MainGame::initSystems() {
     GCC_NEW EventManager("Main EventManager", true);
 
+    _gameLogic.Init();
+
     _window.init("Hey ho!", _screenWidth, _screenHeight, NULL, NULL);
     glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
     initShaders();
     _agentSpriteBatch.init(&_textureProgram);
-    _camera.init(_screenWidth, _screenHeight);
+    _camera->init(_screenWidth, _screenHeight);
 
     glfwSetCursorPosCallback(_window.window, InputManager::cursorFunction);
     glfwSetMouseButtonCallback(_window.window, InputManager::mouseButtonFunction);
@@ -184,7 +187,7 @@ void MainGame::initLevel() {
     _player->init(PLAYER_SPEED, _levels[_currentLevel]->getStartPlayerPos(), &_camera);
     */
 
-    _player = _gameLogic.CreatePlayer(PLAYER_SPEED, _levels[_currentLevel]->getStartPlayerPos(), &_camera, nullptr).lock();
+    _player = _gameLogic.CreatePlayer(PLAYER_SPEED, _levels[_currentLevel]->getStartPlayerPos(), std::weak_ptr<Camera2D>(_camera), nullptr).lock();
 
     /*
     std::mt19937 randomEngine;
@@ -244,12 +247,37 @@ void MainGame::gameLoop() {
     if (!pClient->Connect()) {
         GCC_ERROR("Couldn't attach to game server.\n");
     }
+    
+    // Some helpful constants.
+    const float DESIRED_FPS = 60.0f; // FPS the game is designed to run at
+    const int MAX_PHYSICS_STEPS = 6; // Max number of physics steps per frame
+    const long MS_PER_SECOND = 1000; // Number of milliseconds in a second
+    const long US_PER_SECOND = 1000000; // Number of microseconds in a second
+    const long NS_PER_SECOND = 1000000000; // Number of nanoseconds in a second
+    const float DESIRED_FRAMETIME = ((float) US_PER_SECOND / (float) DESIRED_FPS) / (float) US_PER_SECOND; // The desired frame time per frame
+    const float MAX_DELTA_TIME = 1.0f; // Maximum size of deltaTime
+
+    // Zoom out the camera by 4x
+    const float CAMERA_SCALE = 1.0f / 4.0f;
+    _camera->setScale(CAMERA_SCALE);
+
+    // Start our previousTicks variable
+    float previousTime = glfwGetTime();
+    float newTime;
 
     glm::mat4 projection = glm::mat4();
     float xScale = (float) _window.height / (float) _window.width;
     projection = glm::scale(projection, glm::vec3(xScale, -1.0f, 1.0f));
 
     while (_gameState == GameState::PLAY) {
+        // Calculate the frameTime in milliseconds
+        newTime = glfwGetTime();
+        float frameTime = newTime - previousTime;
+        // Get the total delta time
+        float totalDeltaTime = frameTime / DESIRED_FRAMETIME;
+
+        previousTime = newTime; // Store newTicks in previousTicks so we can use it next frame
+
         // Set the base depth to 1.0
         glClearDepth(1.0);
         CHK_ERR("glClearDepth");
@@ -288,7 +316,7 @@ void MainGame::gameLoop() {
         _debugView.curveTo(0.7 * _window.width, 0.7 * _window.height, 0.6 * _window.width, 0.7 * _window.height);
         
         //_camera.setScale(1.0f / 4.0f);
-        _camera.setScale(1.0f / 4.0f);
+        //_camera->setScale(1.0f / 4.0f);
         //_camera.setPosition(InputManager::instance().getMouseCoords());
         //_camera.setPosition(glm::vec2(_window.width / 2.0f, _window.height / 2.0f));
         //_camera.update();
@@ -296,7 +324,7 @@ void MainGame::gameLoop() {
         glm::vec2 screen = (InputManager::instance().getMouseCoords() / glm::vec2(_window.width, _window.height)) * 2.0f - 1.0f;
         screen.y *= -1;
 
-        glm::vec4 mouse = _camera.getInverseMatrix() * glm::vec4(screen, 0.0f, 1.0f);
+        glm::vec4 mouse = _camera->getInverseMatrix() * glm::vec4(screen, 0.0f, 1.0f);
 
         _debugView.move(1.0 * _window.width, 1.0 * _window.height, 0xFF0000FF);
         _debugView.curveTo(mouse.x, mouse.y, 1.0 * _window.width, -1.0 * _window.height);
@@ -312,13 +340,13 @@ void MainGame::gameLoop() {
         _debugView.move(0.0f, 0.0f, 0xFF000000);
         _debugView.lineTo(mouse.x, mouse.y);
 
-        _debugView.draw(_camera.getCameraMatrix());
+        _debugView.draw(_camera->getCameraMatrix());
 
-        _player->Update(1000.0f / 60.0f);
+        _gameLogic.VOnUpdate(1000.0f / 60.0f);
         auto pPlayerPos = _player->GetComponent<PositionComponent>(PositionComponent::COMPONENT_ID).lock();
         if (pPlayerPos)
-            _camera.setPosition(glm::vec2(pPlayerPos->x, pPlayerPos->y));
-        _camera.update();
+            _camera->setPosition(glm::vec2(pPlayerPos->x, pPlayerPos->y));
+        _camera->update();
 
         CHK_ERR("Before use");
         _textureProgram.use();
@@ -334,7 +362,7 @@ void MainGame::gameLoop() {
         CHK_ERR("setUniform");
 
         // Grab the camera matrix
-        glm::mat4 projectionMatrix = _camera.getCameraMatrix();
+        glm::mat4 projectionMatrix = _camera->getCameraMatrix();
         GLint pUniform = _textureProgram.getUniform("P");
         CHK_ERR("getUniform");
         glUniformMatrix4fv(pUniform, 1, GL_FALSE, &projectionMatrix[0][0]);
@@ -347,10 +375,13 @@ void MainGame::gameLoop() {
         // Begin drawing agents
         _agentSpriteBatch.begin();
 
+        _gameLogic.VOnRender(_agentSpriteBatch);
+        /*
         auto pPlayerRender = _player->GetComponent<RenderComponent>(RenderComponent::COMPONENT_ID).lock();
         if (pPlayerRender) {
             pPlayerRender->draw(_agentSpriteBatch);
         }
+        */
 
         _agentSpriteBatch.end();
         CHK_ERR("agentSpriteBatchEnd");
@@ -371,11 +402,16 @@ void MainGame::gameLoop() {
         processInput();
         InputManager::instance().update();
 
+        // End the frame, limit the FPS, and get the current FPS.
+        float renderTime = glfwGetTime() - newTime;
+        long totalSleepTime = (US_PER_SECOND / DESIRED_FPS) - (US_PER_SECOND * renderTime);
+        if (totalSleepTime > 0) {
 #ifdef _WIN32
-    	std::this_thread::sleep_for(std::chrono::microseconds(16000));
+			std::this_thread::sleep_for(std::chrono::microseconds(totalSleepTime));
 #else
-		usleep(16000);
+			usleep(totalSleepTime);
 #endif
+        }
     }
 
     _player->Destroy();

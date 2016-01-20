@@ -8,7 +8,7 @@ class EvtData_Destroy_Actor : public BaseEventData {
     ActorId m_id;
 
 public:
-    static const EventType sk_EventType;
+    static const EventType sk_EventType = 0xd32340ca;
 
     explicit EvtData_Destroy_Actor(ActorId id = -1) : m_id(id) { }
     explicit EvtData_Destroy_Actor(std::istrstream& in) {
@@ -43,7 +43,7 @@ class EvtData_Fire : public BaseEventData {
     ActorId m_gun;
 
 public:
-    static const EventType sk_EventType;
+    static const EventType sk_EventType = 0x814a9705;
 
     explicit EvtData_Fire(ActorId id = -1, ActorId gun = -1) : m_id(id), m_gun(gun) { }
     explicit EvtData_Fire(std::istrstream& in) {

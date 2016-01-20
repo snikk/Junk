@@ -15,6 +15,7 @@ add_executable (
 
     zombie/actor/components/AI.cpp
     zombie/actor/components/Health.cpp
+    zombie/actor/components/Inventory.cpp
     zombie/actor/components/Render.cpp
 
     zombie/events/Events.cpp

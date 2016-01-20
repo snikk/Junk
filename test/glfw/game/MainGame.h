@@ -42,8 +42,7 @@ private:
 
     Shader _textureProgram; ///< The shader program                           
 
-    Camera2D _camera; ///< Main Camera                                             
-
+    std::shared_ptr<Camera2D> _camera; ///< Main Camera                                             
     SpriteBatch _agentSpriteBatch; ///< Draws all agents                           
     DebugView _debugView;
     

@@ -1,3 +1,4 @@
 #include "Events.h"
 
-const EventType EvtData_Destroy_Actor::sk_EventType(0xd32340ca);
+const EventType EvtData_Destroy_Actor::sk_EventType;
+const EventType EvtData_Fire::sk_EventType;

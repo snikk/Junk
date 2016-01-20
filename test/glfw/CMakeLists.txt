@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.8.11)
 project (Zombie)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 if (CMAKE_VERSION VERSION_LESS "3.1")
     set (CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 else ()

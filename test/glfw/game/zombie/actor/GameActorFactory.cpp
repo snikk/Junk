@@ -4,7 +4,6 @@
 #include "components/Health.h"
 #include "components/AI.h"
 
-/*
 StrongActorPtr GameActorFactory::CreatePlayer(float speed, glm::vec2 pos, Camera2D* camera, std::vector<Bullet>* bullets) {
     StrongActorPtr pPlayer(GCC_NEW Actor(GetNextActorId()));
 
@@ -49,7 +48,7 @@ StrongActorPtr GameActorFactory::CreatePlayer(float speed, glm::vec2 pos, Camera
         pPlayerAI->speed = speed;
 
         pPlayerAI->forward = GLFW_KEY_W;
-        pPlayerAI->backward = GLFW_KEY_S;
+        pPlayerAI->backwards = GLFW_KEY_S;
         pPlayerAI->left = GLFW_KEY_A;
         pPlayerAI->right = GLFW_KEY_D;
 
@@ -99,5 +98,4 @@ StrongActorPtr GameActorFactory::CreateZombie() {
 
     return pZombie;
 }
-*/
 

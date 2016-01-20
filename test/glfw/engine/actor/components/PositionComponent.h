@@ -5,13 +5,13 @@
 
 class PositionComponent : public ActorComponent {
 public:
-    ~PositionComponent() { printf ("Destroyed this Position Component %u\n", VGetId()); }
+    ~PositionComponent() { }
     const static ComponentId COMPONENT_ID;
 
     virtual bool VInit(const rapidjson::Value& data);
     virtual ComponentId VGetId(void) const { return COMPONENT_ID; };
     virtual ComponentId VGetComponentId(void) const { return VGetId(); }
-    virtual void VPostInit(void) { printf("Position component | x = %f | y = %f | z = %f\n", x, y, z); }
+    virtual void VPostInit(void) { }
 
     float x = 0.0f;
     float y = 0.0f;

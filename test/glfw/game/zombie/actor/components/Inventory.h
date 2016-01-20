@@ -1,7 +1,7 @@
 #ifndef __INVENTORY_H__
 #define __INVENTORY_H__
 
-#include <actor/ActorComponent>
+#include <actor/ActorComponent.h>
 
 class InventoryComponent : public ActorComponent {
 public:
@@ -12,14 +12,13 @@ public:
     virtual ComponentId VGetComponentId(void) const { return VGetId(); }
     virtual void VPostInit(void) { }
 
-    float maxHealth;
-    float currentHealth;
+    int currentGunIndex = -1;
+    std::vector<StrongActorPtr> guns;
 
-    float getHealthPercentage() const { return maxHealth / currentHealth; }
+    virtual WeakActorPtr GetCurrentGun();
 };
 
-extern ActorComponent* CreateHealth();
-};
+extern ActorComponent* CreateInventory();
 
 
 #endif

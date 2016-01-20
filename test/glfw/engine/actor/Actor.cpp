@@ -7,7 +7,6 @@ Actor::Actor(ActorId id) {
 }
 
 Actor::~Actor(void) {
-    printf("Destroying Actor | m_id = %d\n", m_id);
 }
 
 bool Actor::Init(const rapidjson::Value& val) {
@@ -27,9 +26,7 @@ bool Actor::Init(const rapidjson::Value& val) {
 }
 
 void Actor::PostInit(void) {
-    printf("Actor post Init\n");
     for (ActorComponents::iterator it = m_components.begin(); it != m_components.end(); ++it) {
-        printf("Actor printing out the components!\n");
         it->second->VPostInit();
     }
 }
@@ -45,6 +42,5 @@ void Actor::Update(int deltaMs) {
 }
 
 void Actor::AddComponent(StrongActorComponentPtr pComponent) {
-    printf("Inserting the actor component\n");
     m_components.insert(std::make_pair(pComponent->VGetId(), pComponent));
 }

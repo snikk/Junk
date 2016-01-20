@@ -7,9 +7,11 @@
 
 class GameActorFactory : public ActorFactory {
 public:
+    /*
     StrongActorPtr CreatePlayer(float speed, glm::vec2 pos, Camera2D* camera, std::vector<Bullet>* bullets);
     StrongActorPtr CreateHuman();
     StrongActorPtr CreateZombie();
+    */
 };
 
 #endif
