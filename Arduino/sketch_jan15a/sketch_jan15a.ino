@@ -4,6 +4,14 @@ const int pinDetector1a = 2;
 const int pinDetector1b = 4;
 const int feedback = 13;
 
+const double distance = 11.0 / 16.0;
+const long microsInSecond = 1000000;
+const long inchesInFoot = 12;
+const long feetInMile = 5280;
+const long secondsInMinute = 60;
+const long minutesInHour = 60;
+const double inchesToMile = inchesInFoot * feetInMile;
+
 long lastMicro = 0;
 volatile long currentMicro = 0;
 long trueMicros;
@@ -36,7 +44,7 @@ void setup() {
   pinMode(pinDetector1b, INPUT);
   digitalWrite(pinDetector1a, HIGH);
   digitalWrite(pinDetector1b, HIGH);
-  attachInterrupt(digitalPinToInterrupt(pinDetector1a), broken, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(pinDetector1a), broken, FALLING);
 
   pinMode(feedback, OUTPUT);
 }
@@ -67,7 +75,9 @@ void loop() {
     }
     checkSpeed = false;
     Serial.print("Detect speed! | dur = ");
-    Serial.println(duration);
+    Serial.print(duration);
+    Serial.print(" | speed = ");
+    Serial.println((((distance / duration) * microsInSecond) / inchesToMile) * secondsInMinute * minutesInHour);
   }
   if (currentMicro != lastMicro) {
     
@@ -110,11 +120,7 @@ void loop() {
 }
 
 void broken() {
-  boolean isBroken = (PIND & (1 << pinDetector1a)) != 0;
-  if (!isBroken && first) {
-    checkSpeed = true;
-    duration = micros();
-  }
-  first = isBroken;
+  checkSpeed = true;
+  duration = micros();
 }
 
