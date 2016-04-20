@@ -21,7 +21,7 @@ endif()
 include_directories (
     ${PNG_INCLUDE_DIR}
     3rdparty/glfw/include
-	3rdparty/glm/
+    3rdparty/glm/
     3rdparty/rapidjson/include/
     3rdparty/fastdelegate/
     )

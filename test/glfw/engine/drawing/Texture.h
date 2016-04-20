@@ -1,8 +1,6 @@
 #ifndef __TEXTURE_H__
 #define __TEXTURE_H__
-
-#include "../common.h"
-
+#include "../common.h" 
 struct Texture {
     GLuint id;
     int width;
@@ -34,6 +32,10 @@ struct ColorRGBA8 {
         r = (color >> 16) & 0xFF;
         g = (color >> 8) & 0xFF;
         b = color & 0xFF;
+    }
+
+    int get() {
+        return (a << 24) | (r << 16) | (g << 8) | b;
     }
 };
 

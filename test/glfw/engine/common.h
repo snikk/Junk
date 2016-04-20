@@ -25,6 +25,7 @@
 #include <list>
 #include <strstream>
 #include <chrono>
+#include <cmath>
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
