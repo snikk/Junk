@@ -1,106 +1,13 @@
 #include "Network.h"
 
-int main(int argc, char** argv) {
-    printf("Hello, World!\n");
-
-    struct sockaddr_in sa;
-    
-    inet_pton(AF_INET, "192.168.1.1", &(sa.sin_addr));
-
-    printf("addr | hex = %#010x | int = %d\n", sa.sin_addr.s_addr, sa.sin_addr.s_addr);
-
-    printf("-----------------------------------\n");
-
-    struct addrinfo hints;
-    struct addrinfo *servinfo;
-    struct addrinfo validConnection;
-    struct sockaddr_in validAddr;
-    validConnection.ai_addr = (struct sockaddr *) &validAddr;
-
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_flags = AI_PASSIVE;
-
-    int status;
-    if ((status = getaddrinfo("www.google.com", NULL, &hints, &servinfo)) != 0) {
-        printf("Well that didn't go as expected.");
-        exit(1);
-    }
-
-    for (struct addrinfo *info = servinfo; info != NULL; info = info->ai_next) {
-        char *buffer = (char*) malloc(64);
-        memset(buffer, 0, 64);
-        inet_ntop(info->ai_family, info->ai_family == AF_INET ? &(((struct sockaddr_in *)(info->ai_addr))->sin_addr) : &(((struct sockaddr_in6 *)(info->ai_addr))->sin6_addr), buffer, 64);
-        printf("Hey there | %s | ", buffer);
-        if (info->ai_family == AF_INET) {
-            struct sockaddr_in *addr = (struct sockaddr_in *) info->ai_addr;
-
-            memcpy(&validConnection, info, sizeof(struct addrinfo));
-            validConnection.ai_addr = (struct sockaddr *) &validAddr;
-            memcpy(&validAddr, addr, sizeof(struct sockaddr_in));
-
-            printf("AF_INET | hex = %#010x | int = %d", addr->sin_addr.s_addr, addr->sin_addr.s_addr);
-        } else if (info->ai_family == AF_INET6) {
-            struct sockaddr_in6 *addr = (struct sockaddr_in6 *) info->ai_addr;
-            printf("AF_INET6 | hex = ");
-
-            for (int i = 0; i < 16; i++) {
-                if (i > 0 && i % 2 == 0)
-                    printf(":");
-                printf("%02x", addr->sin6_addr.s6_addr[i]);
-            }
-        }
-        printf("\n");
-    }
-
-    freeaddrinfo(servinfo);
-
-    printf("validConnection | hex = %#010x | int = %d\n", ((struct sockaddr_in *)validConnection.ai_addr)->sin_addr.s_addr, ((struct sockaddr_in *)validConnection.ai_addr)->sin_addr.s_addr);
-    printf("validAddr| hex = %#010x | int = %d\n", validAddr.sin_addr.s_addr, validAddr.sin_addr.s_addr);
-    int sock = socket(validConnection.ai_family, validConnection.ai_socktype, validConnection.ai_protocol);
-
-    if (sock == -1) {
-        printf("Hmm... Couldn't get the socket.  Bummer. | errno = %d\n", errno);
-    }
-
-    printf("Added that sock!  YES! | sock = %d\n", sock);
-
-    if (close(sock) == -1) {
-        printf("hmmmm.... I didn't close.  How very very odd.\n");
-        exit(1);
-    }
-
-    if (close(sock) != -1) {
-        printf("Succeeded!?  This was already closed though.  Kinda loosey goosey.\n");
-        exit(1);
-    }
+int createServer(Server** serverLocation, const char* port, void (*onClient)(Server*, Client*), void (*onData)(Server *, Client *)) {
+    *serverLocation = malloc(sizeof(Server));
+    Server* server = *serverLocation;
 
     struct addrinfo *res;
-
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE;
-
-    getaddrinfo(NULL, "3490", &hints, &res);
-
-    int listener = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-
-    while (1) {
-    }
-
-    free(buf);
-    free(remoteIP);
-
-    return 0;
-}
-
-int createServer(Server** serverLocation, const char* port) {
-    *serverLocation = (Server*) malloc(sizeof Server);
-    Server* server;
-
     struct addrinfo hints;
-    memset(&hints, 0, sizeof hints);
+
+    memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
@@ -114,7 +21,7 @@ int createServer(Server** serverLocation, const char* port) {
         return 1;
     }
 
-    if (bind(listener, res->ai_addr, res->ai_addrlen) == -1) {
+    if (bind(server->listener, res->ai_addr, res->ai_addrlen) == -1) {
         printf("Failed to bind... OK.\n");
         return 1;
     }
@@ -126,21 +33,36 @@ int createServer(Server** serverLocation, const char* port) {
 
     listen(server->listener, 10);
 
-    server->fdMax = listener;
+    FD_ZERO(&(server->master));
+    FD_SET(server->listener, &(server->master));
+    FD_ZERO(&(server->read));
 
-    FD_ZERO(&master);
-    FD_SET(listener, &master);
-    FD_ZERO(&read);
-
-    server->clients = malloc(MAX_CLIENTS * sizeof Client);
+    server->clients = malloc(MAX_CLIENTS * sizeof(ClientStorage));
+    server->freeClient = server->clients;
     server->numClients = 0;
+    server->fdMax = server->listener;
+
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (i > 0)
+            server->clients[i].prev = server->clients[i - 1];
+        else
+            server->clients[i].prev = NULL;
+
+        if (i < MAX_CLIENTS - 1)
+            server->clients[i].next = server->clients[i + 1];
+        else
+            server->clients[i].next = NULL;
+    }
+
+    server->onClient = onClient;
+    server->onData = onData;
 
     return 0;
 }
 
-int destroyServer(Server** server) {
-    free((*server)->clients);
-    free(*server);
+int destroyServer(Server* server) {
+    free(server->clients);
+    free(server);
     return 0;
 }
 
@@ -149,39 +71,41 @@ int doSelect(Server* server) {
     socklen_t addr_len = sizeof(struct sockaddr_storage);
     char remoteIP[INET6_ADDRSTRLEN];
 
-    read = master;
+    server->read = server->master;
 
-    if (select(server->numClients + 1, &read, NULL, NULL, NULL) == -1) {
+    if (select(server->fdMax + 1, &(server->read), NULL, NULL, NULL) == -1) {
         printf("Failing on select... FAILING at life.\n");
         return 1;
     }
 
-    if (FD_ISSET(server->listener, &read)) {
-        int newfd = accept(listener, (struct sockaddr *) &addr, &addr_len);
+    if (FD_ISSET(server->listener, &(server->read))) {
+        int newfd = accept(server->listener, (struct sockaddr *) &addr, &addr_len);
         inet_ntop(addr.ss_family,
             (struct sockaddr_in *)&addr,
-            remoteIP, INET6_ADDRSTRLEN),
+            remoteIP, INET6_ADDRSTRLEN);
 
         Client* client;
         if (createClient(&client, server, newfd, remoteIP)) {
             printf("Faled to add that dude.  Not cool brah.\n");
         } else {
-            FD_SET(client->socket, &master);
+            FD_SET(client->socket, &(server->master));
             server->onClient(server, client);
         }
     }
 
     for (int i = 0; i < server->numClients + 1; i++) {
-        Client* client = server->clients[i];
-        if (FD_ISSET(client->socket, &read)) {
+        Client *client = &server->clients[i];
+        if (FD_ISSET(client->socket, &(server->read))) {
             int nbytes;
-            if ((nbytes = recvClient(client)) == 0) {
-                deleteClient(client);
+            if ((nbytes = recvData(client)) == 0) {
+                destroyClient(client, server);
             } else {
                 server->onData(server, client);
             }
         }
     }
+
+    return 0;
 }
 
 int sendData(Client* client, void* data, int size) {
@@ -193,16 +117,16 @@ int sendData(Client* client, void* data, int size) {
 }
 
 int recvData(Client* client) {
-    int nbytes;
-    if ((nbytes = recv(i, client->buffer, MAX_BUFFER, 0)) <= 0) {
-        if (nbytes == 0) {
+    if ((client->nbytes = recv(client->socket, client->buffer, MAX_BUFFER, 0)) <= 0) {
+        if (client->nbytes == 0) {
             printf("socket %d has hung up.\n", client->socket);
         } else {
-            buf[nbytes] = '\0';
             printf("Error getting something back from the remote connection.\n");
         }
+    } else {
+        client->buffer[client->nbytes] = '\0'; 
     }
-    return nbytes;
+    return client->nbytes;
 }
 
 int createClient(Client** clientLocation, Server* server, int fd, char* name) {
@@ -211,18 +135,26 @@ int createClient(Client** clientLocation, Server* server, int fd, char* name) {
         return 1;
     }
 
-    printf("select server: new conncetion from %s on socket %d\n", name, client->socket);
+    if (server->numClients == MAX_CLIENTS) {
+        printf("No more room for clients.  All full.\n");
+        return 1;
+    }
 
-    Client *client = server->clients[server->numClients];
+    ClientStorage *client = &server->freeClient->client;
+    server->freeClient = server->freeClient->next;
     server->numClients++;
-    memset(client, 0, sizeof Client);
+    memset(client, 0, sizeof(Client));
     *clientLocation = client;
+
+    printf("select server: new connection from %s on socket %d\n", name, client->socket);
 
     int len = strlen(name);
     client->name = malloc(len);
     memcpy(client->name, name, len);
 
     client->socket = fd;
+    if (fd > server->fdMax)
+        server->fdMax = fd;
 
     client->buffer = malloc(sizeof(char) * MAX_BUFFER);
 
@@ -232,6 +164,17 @@ int createClient(Client** clientLocation, Server* server, int fd, char* name) {
 int destroyClient(Client* client, Server* server) {
     // TODO: Whelp.  Gotta figure this one out.
 
-    free(client->location);
+    free(client->buffer);
     free(client->name);
+
+    return 0;
+}
+
+void broadcastData(Server* server, Client* client) {
+    for (int i = 0; i < server->numClients; i++) {
+        if (&server->clients[i] == client)
+            continue;
+
+        sendData(&server->clients[i], client->buffer, client->nbytes);
+    }
 }

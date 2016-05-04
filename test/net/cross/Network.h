@@ -18,9 +18,16 @@ typedef struct {
     int socket;
     char* name;
     char* buffer;
+    int nbytes;
 } Client;
 
-typedef struct {
+typedef struct _ClientStoreage {
+    Client client;
+    Client* next;
+    Client* prev;
+} ClientStorage;
+
+typedef struct _Server {
     struct sockaddr_in sa;
 
     struct addrinfo *servinfo;
@@ -30,38 +37,31 @@ typedef struct {
 
     int status;
 
-    struct addrinfo *res;
-
-    int listener = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-
-    char *name;
-
-    struct sockaddr_storage addr;
-    socklen_t addr_len = sizeof(struct sockaddr_storage);
+    int listener;
 
     fd_set master;
     fd_set read;
     int fdMax;
 
-    char *buf;
-    int nbytes;
-
     int numClients;
-    Client* clients;
+    ClientStorage* clients;
+    ClientStorage* freeClient;
 
-    void (*onClient)(Server *, Client *);
-    void (*onData)(Server *, Client *);
+    void (*onClient)(struct _Server *, Client *);
+    void (*onData)(struct _Server *, Client *);
 } Server;
 
-int createServer(Server**, void (*onClient)(Server*, Client*), void (*onData)(Server *, Client *));
-int destroyServer(Server**);
+int createServer(Server**, const char*, void (*onClient)(Server*, Client*), void (*onData)(Server *, Client *));
+int destroyServer(Server*);
 
 int doSelect(Server*);
 
 int createClient(Client**, Server*, int, char*);
-int destroyClient(Client**, Server*);
+int destroyClient(Client*, Server*);
 
 int sendData(Client*, void*, int);
-int recvData(Client*, void*, int);
+int recvData(Client*);
+
+void broadcastData(Server*, Client*);
 
 #endif
