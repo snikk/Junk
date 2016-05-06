@@ -38,20 +38,11 @@ int createServer(Server** serverLocation, const char* port, void (*onClient)(Ser
     FD_ZERO(&(server->read));
 
     server->clients = malloc(MAX_CLIENTS * sizeof(ClientStorage));
-    server->freeClient = server->clients;
     server->numClients = 0;
     server->fdMax = server->listener;
 
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        if (i > 0)
-            server->clients[i].prev = server->clients[i - 1];
-        else
-            server->clients[i].prev = NULL;
-
-        if (i < MAX_CLIENTS - 1)
-            server->clients[i].next = server->clients[i + 1];
-        else
-            server->clients[i].next = NULL;
+        server->clients[i].state = client_free;
     }
 
     server->onClient = onClient;
@@ -93,8 +84,8 @@ int doSelect(Server* server) {
         }
     }
 
-    for (int i = 0; i < server->numClients + 1; i++) {
-        Client *client = &server->clients[i];
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        Client *client = &server->clients[i].client;
         if (FD_ISSET(client->socket, &(server->read))) {
             int nbytes;
             if ((nbytes = recvData(client)) == 0) {
@@ -135,16 +126,23 @@ int createClient(Client** clientLocation, Server* server, int fd, char* name) {
         return 1;
     }
 
-    if (server->numClients == MAX_CLIENTS) {
+    if (server->numClients >= MAX_CLIENTS) {
         printf("No more room for clients.  All full.\n");
         return 1;
     }
 
-    ClientStorage *client = &server->freeClient->client;
-    server->freeClient = server->freeClient->next;
+    int i;
+    for (i = 0; i < MAX_CLIENTS; i++) {
+        if (server->clients[i].state == client_free)
+            break;
+    }
+
+    Client *client = &server->clients[i].client;
     server->numClients++;
     memset(client, 0, sizeof(Client));
     *clientLocation = client;
+
+    server->clients[i].state = client_connected;
 
     printf("select server: new connection from %s on socket %d\n", name, client->socket);
 
@@ -162,7 +160,15 @@ int createClient(Client** clientLocation, Server* server, int fd, char* name) {
 }
 
 int destroyClient(Client* client, Server* server) {
-    // TODO: Whelp.  Gotta figure this one out.
+    if (server->numClients == 0)
+        return 0;
+
+    server->numClients--;
+
+    ((ClientStorage *) client)->state = client_free;
+
+    close(client->socket);
+    FD_CLR(client->socket, &server->master);
 
     free(client->buffer);
     free(client->name);
@@ -171,10 +177,9 @@ int destroyClient(Client* client, Server* server) {
 }
 
 void broadcastData(Server* server, Client* client) {
-    for (int i = 0; i < server->numClients; i++) {
-        if (&server->clients[i] == client)
-            continue;
-
-        sendData(&server->clients[i], client->buffer, client->nbytes);
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (server->clients[i].state == client_connected && &server->clients[i].client != client) {
+            sendData(&server->clients[i].client, client->buffer, client->nbytes);
+        }
     }
 }

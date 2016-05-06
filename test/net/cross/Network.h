@@ -14,6 +14,12 @@
 #define MAX_CLIENTS 32
 #define MAX_BUFFER 256
 
+typedef enum ClientState {
+    client_connected, 
+    client_connecting, 
+    client_free
+} ClientState;
+
 typedef struct {
     int socket;
     char* name;
@@ -21,10 +27,9 @@ typedef struct {
     int nbytes;
 } Client;
 
-typedef struct _ClientStoreage {
+typedef struct _ClientStorage {
     Client client;
-    Client* next;
-    Client* prev;
+    ClientState state;
 } ClientStorage;
 
 typedef struct _Server {
@@ -45,7 +50,6 @@ typedef struct _Server {
 
     int numClients;
     ClientStorage* clients;
-    ClientStorage* freeClient;
 
     void (*onClient)(struct _Server *, Client *);
     void (*onData)(struct _Server *, Client *);
