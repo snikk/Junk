@@ -127,11 +127,13 @@ int main(int argc, char** argv) {
     }
 
     allocateFinal(&final, sz);
+    int sz = 32;
     int firstInCurrent;
     bool fit = false;
 
     while (!fit) {
         fit = true;
+        sz *= 2;
         positions[indices[0]].x = 0;
         positions[indices[0]].y = 0;
         firstInCurrent = indices[0];
@@ -146,20 +148,11 @@ int main(int argc, char** argv) {
                 }
                 positions[indices[i]].x = 0;
                 firstInCurrent = indices[i];
-                printf("Fitting! | x = %d | y = %d\n", positions[indices[i]].x, positions[indices[i]].y);
             } else {
                 positions[indices[i]].x = newX;
                 positions[indices[i]].y = positions[firstInCurrent].y;
-                printf("Fitting! | x = %d | y = %d\n", positions[indices[i]].x, positions[indices[i]].y);
             }
 
-        }
-
-        if (!fit) {
-            freeFinal(&final, sz);
-            sz *= 2;
-            printf("Previous Size = %d | newSize = %d\n", sz / 2, sz);
-            allocateFinal(&final, sz);
         }
     }
 

@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "5D97FAE66794C09052D583C49F32567F41381C88",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "5D97FAE66794C09052D583C49F32567F41381C88" : 0,
+    "080859DCFFBED59897A93F8140873F7889C62DCD" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "FD62A2BE-5A95-4072-BC0C-FDF2DF314FFF",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "5D97FAE66794C09052D583C49F32567F41381C88" : "junk\/",
+    "080859DCFFBED59897A93F8140873F7889C62DCD" : "junk\/test\/oxy\/oxygine-framework\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "TestGame_macosx",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "test\/oxy\/games\/TestGame\/proj.macosx\/TestGame_macosx.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/oxygine\/oxygine-framework.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "080859DCFFBED59897A93F8140873F7889C62DCD"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/snikk\/Junk.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "5D97FAE66794C09052D583C49F32567F41381C88"
+    }
+  ]
+}

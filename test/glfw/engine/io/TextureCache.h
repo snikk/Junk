@@ -4,17 +4,13 @@
 #include <map>
 #include "../drawing/Texture.h"
 #include "../common.h"
+#include "../util/Util.h"
 #include <iostream>
-
-struct cmp_str {
-    bool operator()(const char* lhs, const char* rhs) const {
-        return strcmp(lhs, rhs) < 0;
-    }
-};
 
 class TextureCache {
 public:
     Texture getTexture(const char* texturePath);
+    FontTexture* getFontTexture(Font* f);
 
 private:
     std::map<const char*, Texture, cmp_str> textureMap;

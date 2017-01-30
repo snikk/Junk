@@ -34,4 +34,7 @@ add_library (
 
 set(CMAKE_BUILD_TYPE Debug)
 
+find_package(Freetype REQUIRED)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+
 target_include_directories (engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

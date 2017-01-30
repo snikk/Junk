@@ -1,10 +1,27 @@
 #ifndef __TEXTURE_H__
 #define __TEXTURE_H__
+
 #include "../common.h" 
+#include "Font.h"
+
 struct Texture {
     GLuint id;
     int width;
     int height;
+};
+
+typedef struct Pos {
+    int u;
+    int v;
+    short width;
+    short height;
+} Pos;
+
+struct FontTexture {
+    Texture tex;
+    Font* font;
+    int* indices;
+    Pos* pos;
 };
 
 struct Position {

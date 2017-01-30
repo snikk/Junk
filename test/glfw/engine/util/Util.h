@@ -5,6 +5,12 @@
 
 #define CHK_ERR(msg) checkError(msg, __FILE__, __LINE__)
 
+struct cmp_str {
+    bool operator()(const char* lhs, const char* rhs) const {
+        return strcmp(lhs, rhs) < 0;
+    }
+};
+
 extern void checkError(const char* msg);
 extern void checkError(const char* msg, const char* file, int line);
 
